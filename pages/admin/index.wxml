@@ -1,0 +1,47 @@
+<view class="container">
+
+  <view class="toolbar">
+    <text class="toolbar-title">
+      妈妈的留言{{unreadCount > 0 ? '（' + unreadCount + '条未读）' : ''}}
+    </text>
+    <view class="mark-btn" bindtap="markAllRead" wx:if="{{unreadCount > 0}}">
+      <text>全部已读</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中…</text>
+  </view>
+
+  <view class="empty" wx:elif="{{messages.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">妈妈还没有留言</text>
+  </view>
+
+  <view wx:else>
+    <view wx:for="{{messages}}" wx:key="id" class="msg-card {{!item.readByYiqi ? 'unread' : ''}}">
+      <view class="msg-top">
+        <view class="unread-dot" wx:if="{{!item.readByYiqi}}"></view>
+        <text class="msg-time">{{item.timeStr}}</text>
+      </view>
+      <text class="msg-text">{{item.text}}</text>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="action-row">
+    <view class="action-btn" bindtap="goCompose">
+      <text class="action-emoji">✏️</text>
+      <text class="action-label">给妈妈写信</text>
+    </view>
+    <view class="action-btn" bindtap="goDaily">
+      <text class="action-emoji">📝</text>
+      <text class="action-label">存我的日常</text>
+    </view>
+    <view class="action-btn" bindtap="goMemory">
+      <text class="action-emoji">🔒</text>
+      <text class="action-label">预存记忆</text>
+    </view>
+  </view>
+
+</view>

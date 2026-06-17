@@ -1,0 +1,33 @@
+{
+  "pages": [
+    "pages/mom/index",
+    "pages/together/index",
+    "pages/index/index",
+    "pages/mailbox/index",
+    "pages/talk/index",
+    "pages/letter/index",
+    "pages/admin/index",
+    "pages/compose/index",
+    "pages/daily/index",
+    "pages/memory/index"
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "#C8B8AF",
+    "selectedColor": "#2D3926",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/mom/index",      "text": "妈妈的生活" },
+      { "pagePath": "pages/together/index", "text": "我们俩"    },
+      { "pagePath": "pages/index/index",    "text": "陪陪我"    }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFF5EE",
+    "navigationBarTitleText": "我在这里 💕",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

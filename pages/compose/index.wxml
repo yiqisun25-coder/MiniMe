@@ -1,0 +1,40 @@
+<view class="container">
+
+  <view wx:if="{{!submitted}}">
+    <input
+      class="title-input"
+      placeholder="信件标题（比如：最近的一些事）"
+      placeholder-class="placeholder"
+      value="{{title}}"
+      bindinput="onTitleInput"
+      maxlength="30"
+    />
+
+    <textarea
+      class="textarea"
+      placeholder="亲爱的妈妈，…"
+      placeholder-class="placeholder"
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="1000"
+      auto-height
+    />
+    <view class="char-count">{{content.length}}/1000</view>
+
+    <view
+      class="submit-btn {{(!title || !content || submitting) ? 'disabled' : ''}}"
+      bindtap="onSubmit"
+    >
+      <text>{{submitting ? '发送中…' : '放进信箱 📮'}}</text>
+    </view>
+  </view>
+
+  <view class="success" wx:else>
+    <text class="success-icon">📮</text>
+    <text class="success-text">信已经放进去了 💕\n妈妈下次打开就能看到</text>
+    <view class="back-btn" bindtap="onBack">
+      <text>返回后台</text>
+    </view>
+  </view>
+
+</view>
