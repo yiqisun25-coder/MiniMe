@@ -1,0 +1,70 @@
+.container {
+  padding: 40rpx 48rpx 100rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.loading, .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 160rpx;
+  gap: 20rpx;
+}
+
+.loading-text { font-size: 26rpx; color: #8A7A68; }
+.empty-icon   { font-size: 72rpx; }
+.empty-text   { font-size: 26rpx; color: #8A7A68; }
+
+.letter-card {
+  background: #FFFCF7;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 16rpx;
+  border: 1rpx solid rgba(42, 31, 16, 0.08);
+  box-shadow: 0 2rpx 12rpx rgba(42, 31, 16, 0.04);
+}
+
+.letter-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+}
+
+.letter-title {
+  font-size: 28rpx;
+  color: #8A7A68;
+  font-weight: 400;
+}
+
+.letter-title.unread {
+  color: #2A1F10;
+  font-weight: 600;
+}
+
+.unread-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #2D3926;
+  flex-shrink: 0;
+}
+
+.letter-time {
+  display: block;
+  font-size: 22rpx;
+  color: #B8A898;
+  margin-bottom: 16rpx;
+  letter-spacing: 0.3rpx;
+}
+
+.letter-preview {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 26rpx;
+  color: #5A4A38;
+  line-height: 1.8;
+}

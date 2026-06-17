@@ -1,0 +1,30 @@
+<view class="container">
+
+  <view wx:if="{{!submitted}}">
+    <text class="hint">妈妈会在「我们俩」里看到这条</text>
+    <textarea
+      class="textarea"
+      placeholder="今天在做什么，随手写…"
+      placeholder-class="placeholder"
+      value="{{text}}"
+      bindinput="onInput"
+      maxlength="500"
+      auto-height
+      focus
+    />
+    <view class="char-count">{{text.length}}/500</view>
+    <view class="submit-btn {{(!text || submitting) ? 'disabled' : ''}}" bindtap="onSubmit">
+      <text>{{submitting ? '保存中…' : '存进去 💕'}}</text>
+    </view>
+  </view>
+
+  <view class="success" wx:else>
+    <text class="success-icon">✅</text>
+    <text class="success-text">存好了，妈妈能看到</text>
+    <view class="row">
+      <view class="again-btn" bindtap="onReset"><text>再存一条</text></view>
+      <view class="back-btn"  bindtap="onBack" ><text>返回后台</text></view>
+    </view>
+  </view>
+
+</view>

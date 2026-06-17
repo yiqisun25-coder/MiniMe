@@ -1,0 +1,42 @@
+.container {
+  padding: 48rpx 48rpx 100rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.letter-card {
+  background: #FFFCF7;
+  border-radius: 20rpx;
+  padding: 56rpx 48rpx;
+  border: 1rpx solid rgba(42, 31, 16, 0.08);
+  box-shadow: 0 4rpx 24rpx rgba(42, 31, 16, 0.06);
+}
+
+.letter-date {
+  display: block;
+  font-size: 22rpx;
+  color: #B8A898;
+  margin-bottom: 40rpx;
+  letter-spacing: 0.8rpx;
+}
+
+.letter-body {
+  display: block;
+  font-size: 30rpx;
+  color: #2A1F10;
+  line-height: 2.1;
+  white-space: pre-wrap;
+  font-weight: 400;
+}
+
+.read-receipt {
+  margin-top: 48rpx;
+  text-align: right;
+}
+
+.receipt-text {
+  font-size: 24rpx;
+  color: #2D3926;
+  opacity: 0.7;
+  letter-spacing: 0.5rpx;
+}

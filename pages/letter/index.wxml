@@ -1,0 +1,12 @@
+<view class="container" wx:if="{{letter}}">
+
+  <view class="letter-card">
+    <text class="letter-date">{{letter.timeStr}}</text>
+    <text class="letter-body">{{letter.text}}</text>
+  </view>
+
+  <view class="read-receipt">
+    <text class="receipt-text">已读 ❤️</text>
+  </view>
+
+</view>
