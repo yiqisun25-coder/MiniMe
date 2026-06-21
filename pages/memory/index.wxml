@@ -22,6 +22,15 @@
       auto-height
     />
 
+    <!-- 可选照片 -->
+    <view class="photo-picker" bindtap="choosePhoto">
+      <view wx:if="{{!photoPath}}" class="photo-placeholder">
+        <text class="photo-icon">📷</text>
+        <text class="photo-hint">加一张照片（可选）</text>
+      </view>
+      <image wx:else class="photo-preview" src="{{photoPath}}" mode="aspectFill" />
+    </view>
+
     <picker mode="date" value="{{unlockDate}}" bindchange="onDateChange">
       <view class="date-picker {{unlockDate ? 'filled' : ''}}">
         <text>🔒 解锁日期：{{unlockDate || '点击选择'}}</text>

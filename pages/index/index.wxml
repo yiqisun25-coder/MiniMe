@@ -23,12 +23,23 @@
       <view class="scene-img-area">
         <text class="scene-emoji">{{item.emoji}}</text>
       </view>
-
       <view class="scene-text-area">
         <text class="scene-label">{{item.label}}</text>
         <text class="scene-desc">{{item.desc}}</text>
       </view>
     </view>
+  </view>
+
+  <!-- 给你的信 -->
+  <view class="letter-entry" bindtap="goToMailbox">
+    <view class="letter-entry-left">
+      <text class="letter-entry-icon">💌</text>
+      <text class="letter-entry-title">给你的信</text>
+    </view>
+    <view class="letter-badge" wx:if="{{unreadCount > 0}}">
+      <text class="letter-badge-num">{{unreadCount}}</text>
+    </view>
+    <text wx:else class="letter-entry-arrow">›</text>
   </view>
 
 </view>

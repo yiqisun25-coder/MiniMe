@@ -14,7 +14,7 @@
     "localPlugins": false,
     "disableUseStrict": false,
     "useCompilerPlugins": false,
-    "condition": false,
+    "condition": true,
     "swc": false,
     "disableSWC": true,
     "babelSetting": {
@@ -30,9 +30,13 @@
     "tabIndent": "insertSpaces",
     "tabSize": 2
   },
-  "simulatorPluginLibVersion": {},
+  "simulatorPluginLibVersion": {
+    "wxext14566970e7e9f62": "2.27.3"
+  },
   "packOptions": {
     "ignore": [],
     "include": []
-  }
+  },
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
+  "projectArchitecture": "multiPlatform"
 }

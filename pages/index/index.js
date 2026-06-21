@@ -1,3 +1,15 @@
+const { readData } = require('../../utils/api');
+
+const DEFAULT_AVATAR = '/images/default_avatar.jpg';
+
+const PHOTOS = {
+  main:    '/images/me_main.jpeg',
+  morning: '/images/me_morning.jpeg',
+  night:   '/images/me_night.jpeg',
+  miss:    '/images/me_miss.jpeg',
+  secret:  '/images/me_secret.jpeg',
+};
+
 const SCENES = {
   morning: {
     label: '早安', emoji: '☀️', desc: '元气满满叫你起床',
@@ -37,14 +49,6 @@ const SCENES = {
   },
 };
 
-const PHOTOS = {
-  main:    '/images/me_main.jpeg',
-  morning: '/images/me_morning.jpeg',
-  night:   '/images/me_night.jpeg',
-  miss:    '/images/me_miss.jpeg',
-  secret:  '/images/me_secret.jpeg',
-};
-
 function getGreeting() {
   const h = new Date().getHours();
   if (h >= 5  && h < 12) return '早上好 ☀️';
@@ -57,6 +61,7 @@ function getGreeting() {
 Page({
   data: {
     avatarSrc: PHOTOS.main,
+    uploadedAvatar: '',   // 云端上传的头像 URL（有则覆盖 PHOTOS）
     greeting: '',
     scenes: Object.entries(SCENES).map(([key, s]) => ({
       key, label: s.label, emoji: s.emoji, desc: s.desc,
@@ -64,16 +69,50 @@ Page({
     currentResponse: '',
     activeScene: null,
     bubbleVisible: false,
+    unreadCount: 0,
+    latestLetter: null,
   },
 
   _tapCount: 0,
   _tapTimer: null,
 
   onShow() {
+    if (getApp().globalData.needSetup) { wx.navigateTo({ url: '/pages/setup/index' }); return; }
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ selected: 2 });
     }
     this.setData({ greeting: getGreeting() });
+    this._loadData();
+  },
+
+  async _loadData() {
+    try {
+      const data = await readData();
+      getApp().globalData.binData = data;
+
+      // 加载头像：有上传 → 用上传的；没有 → 用 PHOTOS（不动原有场景照片）
+      let uploadedAvatar = '';
+      if (data.avatarFileId) {
+        try {
+          const res = await wx.cloud.callFunction({
+            name: 'getImageURLs',
+            data: { fileList: [data.avatarFileId] },
+          });
+          const item = res.result && res.result.fileList && res.result.fileList[0];
+          if (item && item.tempFileURL) uploadedAvatar = item.tempFileURL;
+        } catch (_) {}
+      }
+
+      const letters = data.lettersToMom || [];
+      const unreadCount = letters.filter(l => !l.readByMom).length;
+      const latestLetter = letters.sort((a, b) => new Date(b.time) - new Date(a.time))[0] || null;
+      const avatarSrc = uploadedAvatar || PHOTOS.main;
+      this.setData({ unreadCount, latestLetter, avatarSrc, uploadedAvatar });
+    } catch (e) { /* 静默 */ }
+  },
+
+  goToMailbox() {
+    wx.navigateTo({ url: '/pages/mailbox/index' });
   },
 
   onAvatarTap() {
@@ -91,7 +130,9 @@ Page({
     const key = e.currentTarget.dataset.key;
     const responses = SCENES[key].responses;
     const text = responses[Math.floor(Math.random() * responses.length)];
-    this.setData({ bubbleVisible: false, avatarSrc: PHOTOS[key] });
+    // 有上传头像 → 固定显示；没有 → 用场景专属照片
+    const avatarSrc = this.data.uploadedAvatar || PHOTOS[key] || PHOTOS.main;
+    this.setData({ bubbleVisible: false, avatarSrc });
     setTimeout(() => {
       this.setData({ currentResponse: text, activeScene: key, bubbleVisible: true });
     }, 150);

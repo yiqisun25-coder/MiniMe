@@ -1,3 +1,12 @@
+<!-- 开屏动画 -->
+<view wx:if="{{showSplash}}" class="splash {{splashFading ? 'splash-out' : 'splash-in'}}">
+  <view class="splash-content">
+    <text class="splash-emoji">💕</text>
+    <text class="splash-title">我在这里</text>
+    <text class="splash-sub">今天也是值得记录的一天呀！</text>
+  </view>
+</view>
+
 <view class="container">
 
   <!-- 上：居中区 -->
@@ -57,6 +66,29 @@
         auto-height
       />
       <view class="char-count">{{inputText.length}}/300</view>
+      <!-- 时间选择 -->
+      <view class="date-row">
+        <picker mode="date" value="{{selectedDate}}" end="{{today}}" bindchange="onDateChange">
+          <view class="date-picker-btn">
+            <text class="date-icon">📅</text>
+            <text class="date-text">{{selectedDate === today ? '今天' : selectedDate}}</text>
+          </view>
+        </picker>
+        <picker mode="time" value="{{selectedTime}}" bindchange="onTimeChange">
+          <view class="date-picker-btn">
+            <text class="date-icon">🕐</text>
+            <text class="date-text">{{selectedTime}}</text>
+          </view>
+        </picker>
+      </view>
+      <!-- 可选照片 -->
+      <view class="photo-picker" bindtap="choosePhoto">
+        <view wx:if="{{!photoPath}}" class="photo-placeholder">
+          <text class="photo-icon">📷</text>
+          <text class="photo-hint">加一张照片（可选）</text>
+        </view>
+        <image wx:else class="photo-preview" src="{{photoPath}}" mode="aspectFill" />
+      </view>
       <view class="submit-btn {{(!inputText || submitting) ? 'disabled' : ''}}" bindtap="onSubmit">
         <text>{{submitting ? '存中…' : '存下来 💕'}}</text>
       </view>
@@ -78,6 +110,7 @@
             <text class="record-time">{{item.timeStr}}</text>
             <text class="record-mood" wx:if="{{item.mood}}">{{item.mood}}</text>
           </view>
+          <image wx:if="{{item.image}}" class="record-image" src="{{item.image}}" mode="aspectFill" />
           <text class="record-text">{{item.text}}</text>
           <view class="record-actions">
             <view class="action-edit" data-id="{{item.id}}" bindtap="startEdit">
@@ -110,6 +143,17 @@
             maxlength="300"
             auto-height
           />
+          <!-- 照片编辑 -->
+          <view class="photo-picker" style="margin-top:20rpx" bindtap="editChoosePhoto">
+            <view wx:if="{{!editingPhoto}}" class="photo-placeholder">
+              <text class="photo-icon">📷</text>
+              <text class="photo-hint">加一张照片（可选）</text>
+            </view>
+            <view wx:else class="edit-photo-wrap">
+              <image class="photo-preview" src="{{editingPhoto}}" mode="aspectFill" />
+              <view class="edit-photo-remove" catchtap="editRemovePhoto">×</view>
+            </view>
+          </view>
           <view class="edit-actions">
             <view class="action-cancel" bindtap="cancelEdit"><text>取消</text></view>
             <view class="action-save"   bindtap="saveEdit"  ><text>保存</text></view>
