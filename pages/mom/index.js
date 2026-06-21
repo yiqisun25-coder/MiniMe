@@ -1,6 +1,12 @@
 const { readData, writeData } = require('../../utils/api');
 const { formatDateTime } = require('../../utils/time');
 
+function getTodayStr() { return new Date().toISOString().slice(0, 10); }
+function getNowTimeStr() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
 const WELLNESS_SIGNS = [
   { icon: '🍵', wisdom: '饭后喝一小杯普洱，暖胃助消化', care: '记得饭后半小时再喝，慢慢品 💕' },
   { icon: '🌿', wisdom: '饭后散步二十分钟，胜过吃药一副', care: '没事绕着小区走走，我心里都是你' },
@@ -78,20 +84,44 @@ Page({
     submitting: false,
     warmResponse: '',
     showResponse: false,
+    photoPath: '',
     editingId: null,
     editingText: '',
     editingMood: null,
+    editingPhoto: '',      // 当前显示用的图片 URL（resolved）
+    editingPhotoFileId: '', // 原始 cloud:// fileID，用于保存
+    editingPhotoPath: '',  // 用户新选的本地路径
     // 养生签
     wellnessSign: WELLNESS_SIGNS[0],
     wellnessOpened: false,
+    // 开屏
+    showSplash: false,
+    splashFading: false,
+    // 新建表单时间
+    today: '',
+    selectedDate: '',
+    selectedTime: '',
+  },
+
+  onLoad() {
+    this.setData({ today: getTodayStr(), selectedDate: getTodayStr(), selectedTime: getNowTimeStr() });
+    const app = getApp();
+    if (!app.globalData.splashShown) {
+      app.globalData.splashShown = true;
+      this.setData({ showSplash: true });
+      setTimeout(() => this.setData({ splashFading: true }), 1400);
+      setTimeout(() => this.setData({ showSplash: false, splashFading: false }), 2000);
+    }
   },
 
   onShow() {
+    if (getApp().globalData.needSetup) { wx.navigateTo({ url: '/pages/setup/index' }); return; }
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ selected: 0 });
     }
     this.setData({ greeting: getGreeting() });
     this._initWellness();
+    getApp().globalData.binData = null;
     this.load();
   },
 
@@ -104,23 +134,58 @@ Page({
     });
   },
 
+  async _resolveImages(records) {
+    const ids = records.filter(r => r.image && r.image.startsWith('cloud://')).map(r => r.image);
+    if (!ids.length) return records;
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getImageURLs', data: { fileList: ids } });
+      const map = {};
+      (res.result.fileList || []).forEach(f => { if (f.tempFileURL) map[f.fileID] = f.tempFileURL; });
+      return records.map(r => ({
+        ...r,
+        image: r.image && r.image.startsWith('cloud://') ? (map[r.image] || '') : r.image,
+      }));
+    } catch (e) {
+      return records.map(r => ({ ...r, image: r.image && r.image.startsWith('cloud://') ? '' : r.image }));
+    }
+  },
+
   async load() {
     this.setData({ loading: true });
     try {
       const app = getApp();
       const data = app.globalData.binData || await readData();
       if (!app.globalData.binData) app.globalData.binData = data;
-      const records = (data.momRecords || [])
+      let records = (data.momRecords || [])
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
+      records = await this._resolveImages(records);
       this.setData({ records, loading: false });
     } catch (e) {
+      console.error('load error:', e);
       this.setData({ loading: false });
     }
   },
 
   toggleForm() {
-    this.setData({ showForm: !this.data.showForm, inputText: '', selectedMood: null });
+    this.setData({
+      showForm: !this.data.showForm,
+      inputText: '', selectedMood: null, photoPath: '',
+      selectedDate: getTodayStr(), selectedTime: getNowTimeStr(),
+    });
+  },
+
+  onDateChange(e) { this.setData({ selectedDate: e.detail.value }); },
+  onTimeChange(e) { this.setData({ selectedTime: e.detail.value }); },
+
+  choosePhoto() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      success: (res) => {
+        this.setData({ photoPath: res.tempFiles[0].tempFilePath });
+      },
+    });
   },
 
   onTextInput(e)    { this.setData({ inputText: e.detail.value }); },
@@ -138,19 +203,30 @@ Page({
       const mood = this.data.selectedMood !== null
         ? MOODS[this.data.selectedMood].emoji + ' ' + MOODS[this.data.selectedMood].label
         : null;
+      let image = '';
+      if (this.data.photoPath) {
+        const ext = this.data.photoPath.split('.').pop() || 'jpg';
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath: `mom/${Date.now()}.${ext}`,
+          filePath: this.data.photoPath,
+        });
+        image = uploadRes.fileID;
+      }
+      const time = new Date(`${this.data.selectedDate}T${this.data.selectedTime}:00`).toISOString();
       data.momRecords = [
-        { id: String(Date.now()), text, mood, time: new Date().toISOString() },
+        { id: String(Date.now()), text, mood, image, time },
         ...(data.momRecords || []),
       ];
       await writeData(data);
       app.globalData.binData = data;
-      const records = (data.momRecords || [])
+      let records = (data.momRecords || [])
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
+      records = await this._resolveImages(records);
       const response = WARM_RESPONSES[Math.floor(Math.random() * WARM_RESPONSES.length)];
       this.setData({
         submitting: false, showForm: false,
-        inputText: '', selectedMood: null,
+        inputText: '', selectedMood: null, photoPath: '',
         records, warmResponse: response, showResponse: true,
       });
       setTimeout(() => this.setData({ showResponse: false }), 3000);
@@ -164,17 +240,44 @@ Page({
     const id = e.currentTarget.dataset.id;
     const record = this.data.records.find(r => r.id === id);
     if (!record) return;
+    // 从原始缓存拿 cloud:// fileID（resolved 后的 URL 不能用于保存）
+    const rawData = getApp().globalData.binData;
+    const rawRecord = rawData && (rawData.momRecords || []).find(r => r.id === id);
     let editingMood = null;
     if (record.mood) {
       MOODS.forEach((m, i) => {
         if (record.mood.includes(m.emoji)) editingMood = i;
       });
     }
-    this.setData({ editingId: id, editingText: record.text, editingMood });
+    this.setData({
+      editingId: id,
+      editingText: record.text,
+      editingMood,
+      editingPhoto: record.image || '',
+      editingPhotoFileId: rawRecord ? (rawRecord.image || '') : '',
+      editingPhotoPath: '',
+    });
   },
 
   cancelEdit() {
-    this.setData({ editingId: null, editingText: '', editingMood: null });
+    this.setData({ editingId: null, editingText: '', editingMood: null, editingPhoto: '', editingPhotoFileId: '', editingPhotoPath: '' });
+  },
+
+  editChoosePhoto() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      success: (res) => {
+        this.setData({
+          editingPhoto: res.tempFiles[0].tempFilePath,
+          editingPhotoPath: res.tempFiles[0].tempFilePath,
+        });
+      },
+    });
+  },
+
+  editRemovePhoto() {
+    this.setData({ editingPhoto: '', editingPhotoFileId: '', editingPhotoPath: '' });
   },
 
   async saveEdit() {
@@ -186,15 +289,30 @@ Page({
       const mood = this.data.editingMood !== null
         ? MOODS[this.data.editingMood].emoji + ' ' + MOODS[this.data.editingMood].label
         : null;
+      // 照片处理：新选了 → 上传；没改 → 用原 fileID；手动删了 → ''
+      let image = this.data.editingPhotoFileId;
+      if (this.data.editingPhotoPath) {
+        const ext = this.data.editingPhotoPath.split('.').pop() || 'jpg';
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath: `mom/${Date.now()}.${ext}`,
+          filePath: this.data.editingPhotoPath,
+        });
+        image = uploadRes.fileID;
+      }
       data.momRecords = (data.momRecords || []).map(r =>
-        r.id === this.data.editingId ? { ...r, text, mood } : r
+        r.id === this.data.editingId ? { ...r, text, mood, image } : r
       );
       await writeData(data);
       app.globalData.binData = data;
-      const records = (data.momRecords || [])
+      let records = (data.momRecords || [])
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
-      this.setData({ records, editingId: null, editingText: '', editingMood: null });
+      records = await this._resolveImages(records);
+      this.setData({
+        records,
+        editingId: null, editingText: '', editingMood: null,
+        editingPhoto: '', editingPhotoFileId: '', editingPhotoPath: '',
+      });
       wx.showToast({ title: '已更新', icon: 'success' });
     } catch (e) {
       wx.showToast({ title: '更新失败', icon: 'none' });

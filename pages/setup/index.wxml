@@ -1,0 +1,94 @@
+<view class="container">
+
+  <!-- 初始选择 -->
+  <view wx:if="{{step === 'initial'}}">
+    <text class="logo">💕</text>
+    <text class="title">MiniMe</text>
+    <text class="subtitle">一个专属你们的小空间</text>
+
+    <view class="card" bindtap="onCreateTap">
+      <text class="card-emoji">👧</text>
+      <text class="card-main">我是女儿</text>
+      <text class="card-sub">创建家庭，生成邀请码</text>
+    </view>
+
+    <view class="card" bindtap="onJoinTap">
+      <text class="card-emoji">👩</text>
+      <text class="card-main">我是妈妈</text>
+      <text class="card-sub">输入女儿给我的邀请码</text>
+    </view>
+
+    <text class="error" wx:if="{{error}}">{{error}}</text>
+  </view>
+
+  <!-- 设置专属邀请码 -->
+  <view wx:elif="{{step === 'set_code' || step === 'creating'}}">
+    <text class="logo">🔑</text>
+    <text class="title">设个专属码</text>
+    <text class="subtitle">你们俩的暗号，好记就行</text>
+
+    <input
+      class="code-input"
+      placeholder="比如 MAMA66"
+      placeholder-class="code-placeholder"
+      value="{{customCode}}"
+      bindinput="onCustomCodeInput"
+      maxlength="8"
+      focus="{{true}}"
+    />
+    <text class="input-hint">4-8位，字母或数字，不区分大小写</text>
+
+    <text class="error" wx:if="{{error}}">{{error}}</text>
+
+    <view class="btn-primary {{step === 'creating' ? 'disabled' : ''}}" bindtap="onConfirmCreate">
+      <text>{{step === 'creating' ? '创建中…' : '就用这个 →'}}</text>
+    </view>
+    <view class="btn-back" bindtap="onBackToInitial"><text>← 返回</text></view>
+  </view>
+
+  <!-- 创建成功，展示邀请码 -->
+  <view wx:elif="{{step === 'created'}}">
+    <text class="logo">🎉</text>
+    <text class="title">家庭建好了</text>
+    <text class="subtitle" wx:if="{{migrated}}">旧数据也帮你搬过来了 💕</text>
+    <text class="subtitle" wx:else>把邀请码发给妈妈</text>
+
+    <view class="code-box">
+      <text class="code-label">你的家庭邀请码</text>
+      <text class="code-text">{{familyCode}}</text>
+      <text class="code-hint">妈妈打开小程序后输入这6个字母就连上了</text>
+    </view>
+
+    <view class="btn-primary" bindtap="onEnterApp">
+      <text>进入我们的小空间 →</text>
+    </view>
+  </view>
+
+  <!-- 输入邀请码 -->
+  <view wx:elif="{{step === 'joining' || step === 'joining_loading'}}">
+    <text class="logo">💌</text>
+    <text class="title">输入邀请码</text>
+    <text class="subtitle">女儿发给你的那6个字母</text>
+
+    <input
+      class="code-input"
+      placeholder="例如：ABC123"
+      placeholder-class="code-placeholder"
+      value="{{inputCode}}"
+      bindinput="onCodeInput"
+      maxlength="6"
+      focus="{{true}}"
+    />
+
+    <text class="error" wx:if="{{error}}">{{error}}</text>
+
+    <view class="btn-primary {{step === 'joining_loading' ? 'disabled' : ''}}" bindtap="onConfirmJoin">
+      <text>{{step === 'joining_loading' ? '连接中…' : '连上去 💕'}}</text>
+    </view>
+
+    <view class="btn-back" bindtap="onBackToInitial">
+      <text>← 返回</text>
+    </view>
+  </view>
+
+</view>

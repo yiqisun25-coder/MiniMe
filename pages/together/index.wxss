@@ -1,7 +1,74 @@
 .container {
-  padding: 40rpx 40rpx 160rpx;
+  padding: 24rpx 40rpx 160rpx;
   min-height: 100vh;
   box-sizing: border-box;
+}
+
+/* 视图切换 */
+.view-toggle {
+  display: flex;
+  background: rgba(42,31,16,0.06);
+  border-radius: 20rpx;
+  padding: 6rpx;
+  margin-bottom: 36rpx;
+}
+.toggle-btn {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: #9E8B7E;
+  transition: all 0.2s;
+}
+.toggle-btn.active {
+  background: #fff;
+  color: #2A1F10;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(42,31,16,0.1);
+}
+
+/* 相册墙 */
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20rpx 0 40rpx;
+  justify-content: space-between;
+}
+.polaroid {
+  width: 48%;
+  margin-bottom: 28rpx;
+  background: #fff;
+  padding: 16rpx 16rpx 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(42,31,16,0.12);
+  border-radius: 4rpx;
+  box-sizing: border-box;
+  transform-origin: center center;
+  overflow: visible;
+}
+.polaroid-img {
+  width: 100%;
+  height: 260rpx;
+  display: block;
+}
+.polaroid-caption {
+  padding-top: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+.polaroid-text {
+  font-size: 22rpx;
+  color: #2A1F10;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.polaroid-date {
+  font-size: 20rpx;
+  color: #C8B8AF;
 }
 
 .loading, .empty {
@@ -57,6 +124,7 @@
 
 .card-image {
   width: 100%;
+  height: 320rpx;
   border-radius: 16rpx;
   margin-bottom: 20rpx;
 }

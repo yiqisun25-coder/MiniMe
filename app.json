@@ -3,6 +3,7 @@
     "pages/mom/index",
     "pages/together/index",
     "pages/index/index",
+    "pages/setup/index",
     "pages/mailbox/index",
     "pages/talk/index",
     "pages/letter/index",

@@ -5,6 +5,7 @@ Page({
     title: '',
     text: '',
     unlockDate: '',
+    photoPath: '',
     submitting: false,
     submitted: false,
   },
@@ -13,6 +14,16 @@ Page({
   onTextInput(e)   { this.setData({ text: e.detail.value }); },
   onDateChange(e)  { this.setData({ unlockDate: e.detail.value }); },
 
+  choosePhoto() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      success: (res) => {
+        this.setData({ photoPath: res.tempFiles[0].tempFilePath });
+      },
+    });
+  },
+
   async onSubmit() {
     const { title, text, unlockDate } = this.data;
     if (!title.trim() || !text.trim() || !unlockDate || this.data.submitting) return;
@@ -20,6 +31,18 @@ Page({
     try {
       const app = getApp();
       const data = app.globalData.binData || await readData();
+
+      // 上传照片（如果有）
+      let image = '';
+      if (this.data.photoPath) {
+        const ext = this.data.photoPath.split('.').pop() || 'jpg';
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath: `memories/${Date.now()}.${ext}`,
+          filePath: this.data.photoPath,
+        });
+        image = uploadRes.fileID;
+      }
+
       data.memories = [
         ...(data.memories || []),
         {
@@ -27,6 +50,7 @@ Page({
           title: title.trim(),
           text: text.trim(),
           unlockDate,
+          image,
           time: new Date().toISOString(),
         },
       ].sort((a, b) => a.unlockDate.localeCompare(b.unlockDate));
@@ -39,6 +63,6 @@ Page({
     }
   },
 
-  onReset() { this.setData({ title: '', text: '', unlockDate: '', submitted: false }); },
+  onReset() { this.setData({ title: '', text: '', unlockDate: '', photoPath: '', submitted: false }); },
   onBack()  { wx.navigateBack(); },
 });
