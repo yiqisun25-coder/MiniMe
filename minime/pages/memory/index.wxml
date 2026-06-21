@@ -1,0 +1,57 @@
+<view class="container">
+
+  <view wx:if="{{!submitted}}">
+    <text class="hint">选一个日期，到那天妈妈才能解锁这条记忆</text>
+
+    <input
+      class="title-input"
+      placeholder="标题（比如：第一次带我看海）"
+      placeholder-class="placeholder"
+      value="{{title}}"
+      bindinput="onTitleInput"
+      maxlength="20"
+    />
+
+    <textarea
+      class="textarea"
+      placeholder="写点什么吧…"
+      placeholder-class="placeholder"
+      value="{{text}}"
+      bindinput="onTextInput"
+      maxlength="500"
+      auto-height
+    />
+
+    <!-- 可选照片 -->
+    <view class="photo-picker" bindtap="choosePhoto">
+      <view wx:if="{{!photoPath}}" class="photo-placeholder">
+        <text class="photo-icon">📷</text>
+        <text class="photo-hint">加一张照片（可选）</text>
+      </view>
+      <image wx:else class="photo-preview" src="{{photoPath}}" mode="aspectFill" />
+    </view>
+
+    <picker mode="date" value="{{unlockDate}}" bindchange="onDateChange">
+      <view class="date-picker {{unlockDate ? 'filled' : ''}}">
+        <text>🔒 解锁日期：{{unlockDate || '点击选择'}}</text>
+      </view>
+    </picker>
+
+    <view
+      class="submit-btn {{(!title || !text || !unlockDate || submitting) ? 'disabled' : ''}}"
+      bindtap="onSubmit"
+    >
+      <text>{{submitting ? '保存中…' : '锁进去 🔒'}}</text>
+    </view>
+  </view>
+
+  <view class="success" wx:else>
+    <text class="success-icon">🔒</text>
+    <text class="success-text">锁好了，{{unlockDate}} 解锁</text>
+    <view class="row">
+      <view class="again-btn" bindtap="onReset"><text>再存一条</text></view>
+      <view class="back-btn"  bindtap="onBack" ><text>返回后台</text></view>
+    </view>
+  </view>
+
+</view>

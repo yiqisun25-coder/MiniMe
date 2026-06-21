@@ -1,0 +1,90 @@
+<view class="container">
+
+  <!-- 视图切换 -->
+  <view class="view-toggle">
+    <view
+      class="toggle-btn {{viewMode === 'timeline' ? 'active' : ''}}"
+      data-mode="timeline"
+      bindtap="switchView"
+    ><text>时间线</text></view>
+    <view
+      class="toggle-btn {{viewMode === 'photos' ? 'active' : ''}}"
+      data-mode="photos"
+      bindtap="switchView"
+    ><text>相册墙</text></view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中…</text>
+  </view>
+
+  <!-- 时间线 -->
+  <view wx:elif="{{viewMode === 'timeline'}}">
+    <view class="empty" wx:if="{{items.length === 0}}">
+      <text class="empty-icon">💞</text>
+      <text class="empty-text">这里会记下我们在一起的每一天</text>
+    </view>
+    <view wx:else>
+      <view wx:for="{{items}}" wx:key="id" class="item">
+
+        <!-- 妈妈的记录 -->
+        <view wx:if="{{item.type === 'mom'}}" class="card card-mom">
+          <view class="card-tag">🌸 妈妈的生活</view>
+          <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
+          <text class="card-text">{{item.text}}</text>
+          <view class="card-bottom">
+            <text wx:if="{{item.mood}}" class="card-mood">{{item.mood}}</text>
+            <text class="card-time">{{item.timeStr}}</text>
+          </view>
+        </view>
+
+        <!-- 我的日常 -->
+        <view wx:if="{{item.type === 'daily'}}" class="card card-daily">
+          <view class="card-tag">📨 宝宝来信</view>
+          <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
+          <text class="card-text">{{item.text}}</text>
+          <text class="card-time">{{item.timeStr}}</text>
+        </view>
+
+        <!-- 记忆 - 已解锁 -->
+        <view wx:if="{{item.type === 'memory' && item.unlocked}}" class="card card-memory">
+          <view class="card-tag">✨ 解锁的记忆</view>
+          <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
+          <text class="card-title">{{item.title}}</text>
+          <text class="card-text">{{item.text}}</text>
+          <text class="card-time">{{item.timeStr}}</text>
+        </view>
+
+        <!-- 记忆 - 未解锁 -->
+        <view wx:if="{{item.type === 'memory' && !item.unlocked}}" class="card card-locked">
+          <view class="card-tag">🔒 还没到时候</view>
+          <text class="locked-date">{{item.unlockDate}} 解锁</text>
+        </view>
+
+      </view>
+    </view>
+  </view>
+
+  <!-- 相册墙 -->
+  <view wx:elif="{{viewMode === 'photos'}}">
+    <view class="empty" wx:if="{{photos.length === 0}}">
+      <text class="empty-icon">📷</text>
+      <text class="empty-text">还没有带图片的记录</text>
+    </view>
+    <view class="photo-grid" wx:else>
+      <view
+        wx:for="{{photos}}"
+        wx:key="id"
+        class="polaroid"
+        style="transform: rotate({{item.tilt}}deg)"
+      >
+        <image class="polaroid-img" src="{{item.image}}" mode="aspectFill" />
+        <view class="polaroid-caption">
+          <text class="polaroid-text">{{item.caption}}</text>
+          <text class="polaroid-date">{{item.timeStr}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</view>

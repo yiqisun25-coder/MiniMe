@@ -1,0 +1,159 @@
+.container {
+  min-height: 100vh;
+  padding: 80rpx 60rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #FFF5EE;
+}
+
+.logo {
+  display: block;
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+}
+
+.title {
+  display: block;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #2A1F10;
+  letter-spacing: 4rpx;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: #9E8B7E;
+  margin-bottom: 80rpx;
+  text-align: center;
+}
+
+/* ── 选择卡片 ── */
+.card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 44rpx 40rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border: 1rpx solid rgba(42, 31, 16, 0.08);
+  box-shadow: 0 2rpx 16rpx rgba(42, 31, 16, 0.06);
+  box-sizing: border-box;
+}
+
+.card-emoji { font-size: 52rpx; }
+
+.card-main {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2A1F10;
+}
+
+.card-sub {
+  font-size: 24rpx;
+  color: #9E8B7E;
+}
+
+/* ── 邀请码展示 ── */
+.code-box {
+  width: 100%;
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 52rpx 40rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 48rpx;
+  box-shadow: 0 4rpx 24rpx rgba(42, 31, 16, 0.08);
+}
+
+.code-label {
+  font-size: 24rpx;
+  color: #9E8B7E;
+  letter-spacing: 2rpx;
+}
+
+.code-text {
+  font-size: 72rpx;
+  font-weight: 700;
+  color: #2A1F10;
+  letter-spacing: 12rpx;
+}
+
+.code-hint {
+  font-size: 24rpx;
+  color: #C8B8AF;
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* ── 输入框 ── */
+.code-input {
+  width: 100%;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 36rpx 40rpx;
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #2A1F10;
+  letter-spacing: 12rpx;
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: 0 2rpx 16rpx rgba(42, 31, 16, 0.06);
+  margin-bottom: 24rpx;
+}
+
+.input-hint {
+  font-size: 22rpx;
+  color: #C8B8AF;
+  margin-top: -12rpx;
+  margin-bottom: 32rpx;
+}
+
+.code-placeholder {
+  color: #D8C8BE;
+  font-size: 32rpx;
+  font-weight: 400;
+  letter-spacing: 4rpx;
+}
+
+/* ── 按钮 ── */
+.btn-primary {
+  width: 100%;
+  background: #2D3926;
+  border-radius: 20rpx;
+  padding: 36rpx 0;
+  text-align: center;
+  font-size: 32rpx;
+  color: #F3E8D4;
+  font-weight: 500;
+  box-sizing: border-box;
+  margin-bottom: 24rpx;
+}
+
+.btn-primary.disabled {
+  background: rgba(45, 57, 38, 0.4);
+}
+
+.btn-back {
+  font-size: 26rpx;
+  color: #9E8B7E;
+  padding: 20rpx 0;
+}
+
+.error {
+  font-size: 24rpx;
+  color: #C4706A;
+  text-align: center;
+  margin-bottom: 24rpx;
+}

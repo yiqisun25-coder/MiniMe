@@ -1,0 +1,57 @@
+<view class="container">
+
+  <view wx:if="{{!submitted}}">
+    <text class="hint">妈妈会在「我们俩」里看到这条</text>
+    <textarea
+      class="textarea"
+      placeholder="今天在做什么，随手写…"
+      placeholder-class="placeholder"
+      value="{{text}}"
+      bindinput="onInput"
+      maxlength="500"
+      auto-height
+      focus
+    />
+    <view class="char-count">{{text.length}}/500</view>
+
+    <!-- 加图片 -->
+    <view wx:if="{{!photoPath}}" class="photo-picker" bindtap="choosePhoto">
+      <text class="photo-icon">📷</text>
+      <text class="photo-hint">加一张照片（可选）</text>
+    </view>
+    <view wx:else class="photo-preview-wrap">
+      <image class="photo-preview" src="{{photoPath}}" mode="aspectFill" />
+      <view class="photo-remove" bindtap="removePhoto"><text>×</text></view>
+    </view>
+
+    <!-- 时间选择 -->
+    <view class="date-row">
+      <picker mode="date" value="{{selectedDate}}" end="{{today}}" bindchange="onDateChange">
+        <view class="date-picker">
+          <text class="date-icon">📅</text>
+          <text class="date-text">{{selectedDate === today ? '今天' : selectedDate}}</text>
+        </view>
+      </picker>
+      <picker mode="time" value="{{selectedTime}}" bindchange="onTimeChange">
+        <view class="date-picker">
+          <text class="date-icon">🕐</text>
+          <text class="date-text">{{selectedTime}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="submit-btn {{(!text || submitting) ? 'disabled' : ''}}" bindtap="onSubmit">
+      <text>{{submitting ? '保存中…' : '存进去 💕'}}</text>
+    </view>
+  </view>
+
+  <view class="success" wx:else>
+    <text class="success-icon">✅</text>
+    <text class="success-text">存好了，妈妈能看到</text>
+    <view class="row">
+      <view class="again-btn" bindtap="onReset"><text>再存一条</text></view>
+      <view class="back-btn"  bindtap="onBack" ><text>返回后台</text></view>
+    </view>
+  </view>
+
+</view>

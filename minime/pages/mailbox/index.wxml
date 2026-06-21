@@ -1,0 +1,29 @@
+<view class="container">
+
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中…</text>
+  </view>
+
+  <view class="empty" wx:elif="{{letters.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">还没有信，快去催我写 😄</text>
+  </view>
+
+  <view wx:else>
+    <view
+      wx:for="{{letters}}"
+      wx:key="id"
+      class="letter-card"
+      data-id="{{item.id}}"
+      bindtap="onLetterTap"
+    >
+      <view class="letter-top">
+        <text class="letter-title {{!item.readByMom ? 'unread' : ''}}">{{item.title}}</text>
+        <view class="unread-dot" wx:if="{{!item.readByMom}}"></view>
+      </view>
+      <text class="letter-time">{{item.timeStr}}</text>
+      <text class="letter-preview">{{item.text}}</text>
+    </view>
+  </view>
+
+</view>
