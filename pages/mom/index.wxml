@@ -112,7 +112,7 @@
           </view>
           <image wx:if="{{item.image}}" class="record-image" src="{{item.image}}" mode="aspectFill" />
           <text class="record-text">{{item.text}}</text>
-          <view class="record-actions">
+          <view class="record-actions" wx:if="{{userRole === 'mom'}}">
             <view class="action-edit" data-id="{{item.id}}" bindtap="startEdit">
               <text>✏️ 编辑</text>
             </view>

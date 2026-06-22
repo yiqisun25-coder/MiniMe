@@ -1,4 +1,4 @@
-const { readData } = require('../../utils/api');
+const { readData, getUserRole, getLastSeen } = require('../../utils/api');
 
 const DEFAULT_AVATAR = '/images/default_avatar.jpg';
 
@@ -108,6 +108,15 @@ Page({
       const latestLetter = letters.sort((a, b) => new Date(b.time) - new Date(a.time))[0] || null;
       const avatarSrc = uploadedAvatar || PHOTOS.main;
       this.setData({ unreadCount, latestLetter, avatarSrc, uploadedAvatar });
+
+      // 女儿：计算 Tab 0 未读妈妈帖子数
+      if (getUserRole() === 'daughter' && typeof this.getTabBar === 'function') {
+        const lastSeen = getLastSeen('lastSeenMomRecords');
+        const newMomCount = (data.momRecords || []).filter(r => r.time > lastSeen).length;
+        const badges = [...(this.getTabBar().data.badges || [0, 0, 0])];
+        badges[0] = newMomCount;
+        this.getTabBar().setData({ badges });
+      }
     } catch (e) { /* 静默 */ }
   },
 

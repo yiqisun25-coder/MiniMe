@@ -2,16 +2,15 @@
 
   <!-- 视图切换 -->
   <view class="view-toggle">
-    <view
-      class="toggle-btn {{viewMode === 'timeline' ? 'active' : ''}}"
-      data-mode="timeline"
-      bindtap="switchView"
-    ><text>时间线</text></view>
-    <view
-      class="toggle-btn {{viewMode === 'photos' ? 'active' : ''}}"
-      data-mode="photos"
-      bindtap="switchView"
-    ><text>相册墙</text></view>
+    <view class="toggle-btn {{viewMode === 'timeline' ? 'active' : ''}}" data-mode="timeline" bindtap="switchView">
+      <text>时间线</text>
+      <view class="toggle-badge" wx:if="{{newTimelineCount > 0}}">
+        <text class="toggle-badge-num">{{newTimelineCount}}</text>
+      </view>
+    </view>
+    <view class="toggle-btn {{viewMode === 'photos' ? 'active' : ''}}" data-mode="photos" bindtap="switchView">
+      <text>相册墙</text>
+    </view>
   </view>
 
   <view class="loading" wx:if="{{loading}}">
@@ -32,9 +31,18 @@
           <view class="card-tag">🌸 妈妈的生活</view>
           <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
           <text class="card-text">{{item.text}}</text>
-          <view class="card-bottom">
+          <view class="reactions" wx:if="{{item.reactions && item.reactions.length}}">
+            <view wx:for="{{item.reactions}}" wx:for-item="r" wx:key="time"
+                  class="reaction-chip {{r.type === 'text' ? 'chip-text' : 'chip-emoji'}}">
+              <text>{{r.value}}</text>
+            </view>
+          </view>
+          <view class="card-footer">
             <text wx:if="{{item.mood}}" class="card-mood">{{item.mood}}</text>
-            <text class="card-time">{{item.timeStr}}</text>
+            <text class="card-time footer-time">{{item.timeStr}}</text>
+            <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
+              <text class="reaction-add-label">+ 回应</text>
+            </view>
           </view>
         </view>
 
@@ -43,7 +51,18 @@
           <view class="card-tag">📨 宝宝来信</view>
           <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
           <text class="card-text">{{item.text}}</text>
-          <text class="card-time">{{item.timeStr}}</text>
+          <view class="reactions" wx:if="{{item.reactions && item.reactions.length}}">
+            <view wx:for="{{item.reactions}}" wx:for-item="r" wx:key="time"
+                  class="reaction-chip {{r.type === 'text' ? 'chip-text' : 'chip-emoji'}}">
+              <text>{{r.value}}</text>
+            </view>
+          </view>
+          <view class="card-footer">
+            <text class="card-time footer-time">{{item.timeStr}}</text>
+            <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
+              <text class="reaction-add-label">+ 回应</text>
+            </view>
+          </view>
         </view>
 
         <!-- 记忆 - 已解锁 -->
@@ -52,7 +71,18 @@
           <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
           <text class="card-title">{{item.title}}</text>
           <text class="card-text">{{item.text}}</text>
-          <text class="card-time">{{item.timeStr}}</text>
+          <view class="reactions" wx:if="{{item.reactions && item.reactions.length}}">
+            <view wx:for="{{item.reactions}}" wx:for-item="r" wx:key="time"
+                  class="reaction-chip {{r.type === 'text' ? 'chip-text' : 'chip-emoji'}}">
+              <text>{{r.value}}</text>
+            </view>
+          </view>
+          <view class="card-footer">
+            <text class="card-time footer-time">{{item.timeStr}}</text>
+            <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
+              <text class="reaction-add-label">+ 回应</text>
+            </view>
+          </view>
         </view>
 
         <!-- 记忆 - 未解锁 -->
@@ -72,16 +102,52 @@
       <text class="empty-text">还没有带图片的记录</text>
     </view>
     <view class="photo-grid" wx:else>
-      <view
-        wx:for="{{photos}}"
-        wx:key="id"
-        class="polaroid"
-        style="transform: rotate({{item.tilt}}deg)"
-      >
+      <view wx:for="{{photos}}" wx:key="id" class="polaroid" style="transform: rotate({{item.tilt}}deg)">
         <image class="polaroid-img" src="{{item.image}}" mode="aspectFill" />
         <view class="polaroid-caption">
           <text class="polaroid-text">{{item.caption}}</text>
           <text class="polaroid-date">{{item.timeStr}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 回应弹窗 -->
+  <view class="picker-mask" wx:if="{{pickerVisible}}" bindtap="closeReaction">
+    <view class="picker-sheet" catchtap="">
+      <view class="picker-handle"></view>
+
+      <!-- 已有回应 -->
+      <view wx:if="{{pickerReactions.length}}">
+        <view class="picker-existing-row">
+          <view wx:for="{{pickerReactions}}" wx:for-item="r" wx:for-index="ri" wx:key="time"
+                class="picker-existing-chip">
+            <text>{{r.value}}</text>
+            <text class="picker-existing-del" data-ri="{{ri}}" catchtap="deleteReactionFromPicker">×</text>
+          </view>
+        </view>
+        <view class="picker-divider"></view>
+      </view>
+
+      <view class="picker-emoji-row">
+        <view wx:for="{{emojis}}" wx:key="*this" class="picker-emoji-btn"
+              data-emoji="{{item}}" bindtap="tapEmoji">
+          <text>{{item}}</text>
+        </view>
+      </view>
+      <view class="picker-divider"></view>
+      <view class="picker-text-row">
+        <input
+          class="picker-input"
+          placeholder="说点什么…"
+          placeholder-class="picker-placeholder"
+          value="{{pickerText}}"
+          bindinput="onPickerTextInput"
+          confirm-type="send"
+          bindconfirm="submitText"
+        />
+        <view class="picker-send-btn" bindtap="submitText">
+          <text>发</text>
         </view>
       </view>
     </view>

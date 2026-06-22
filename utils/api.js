@@ -110,4 +110,13 @@ async function joinFamily(inputCode) {
   return res.data;
 }
 
-module.exports = { readData, writeData, createFamily, joinFamily, getFamilyCode, generateCode, EMPTY_DATA };
+function getUserRole() { return wx.getStorageSync('userRole') || null; }
+function setUserRole(role) { wx.setStorageSync('userRole', role); }
+function getLastSeen(key) { return wx.getStorageSync(key) || '1970-01-01T00:00:00.000Z'; }
+function setLastSeen(key) { wx.setStorageSync(key, new Date().toISOString()); }
+
+module.exports = {
+  readData, writeData, createFamily, joinFamily,
+  getFamilyCode, generateCode, EMPTY_DATA,
+  getUserRole, setUserRole, getLastSeen, setLastSeen,
+};

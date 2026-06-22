@@ -1,4 +1,4 @@
-const { createFamily, joinFamily, generateCode } = require('../../utils/api');
+const { createFamily, joinFamily, generateCode, setUserRole } = require('../../utils/api');
 
 
 Page({
@@ -58,6 +58,7 @@ Page({
     this.setData({ step: 'joining_loading', error: '' });
     try {
       await joinFamily(code);
+      setUserRole('mom');
       getApp().globalData.needSetup = false;
       wx.navigateBack();
     } catch (e) {
@@ -66,6 +67,7 @@ Page({
   },
 
   onEnterApp() {
+    setUserRole('daughter');
     getApp().globalData.needSetup = false;
     wx.navigateBack();
   },
