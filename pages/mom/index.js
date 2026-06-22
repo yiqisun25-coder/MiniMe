@@ -1,4 +1,4 @@
-const { readData, writeData } = require('../../utils/api');
+const { readData, writeData, getUserRole, setLastSeen } = require('../../utils/api');
 const { formatDateTime } = require('../../utils/time');
 
 function getTodayStr() { return new Date().toISOString().slice(0, 10); }
@@ -10,14 +10,14 @@ function getNowTimeStr() {
 const WELLNESS_SIGNS = [
   { icon: '🍵', wisdom: '饭后喝一小杯普洱，暖胃助消化', care: '记得饭后半小时再喝，慢慢品 💕' },
   { icon: '🌿', wisdom: '饭后散步二十分钟，胜过吃药一副', care: '没事绕着小区走走，我心里都是你' },
-  { icon: '🌅', wisdom: '清晨空腹一杯温水，唤醒一天的活力', care: '起床第一件事喝水，然后想想一琦 😊' },
+  { icon: '🌅', wisdom: '清晨空腹一杯温水，唤醒一天的活力', care: '起床第一件事喝水，然后想想祎琦 😊' },
   { icon: '🌷', wisdom: '今日宜玫瑰花茶，养颜又疏肝气', care: '我妈本来就好看，喝了更美 💐' },
   { icon: '🌙', wisdom: '睡前泡脚二十分钟，一觉睡到大天亮', care: '水温别超过45度，脚暖了全身都暖' },
   { icon: '🌱', wisdom: '今天多吃深色蔬菜，抗氧化好气色', care: '好气色是养出来的，妈妈越来越年轻' },
   { icon: '☀️', wisdom: '上午十点晒太阳十五分钟，补钙又舒心', care: '去晒晒太阳，你笑起来真的很好看' },
   { icon: '🍃', wisdom: '早晨做五次腹式深呼吸，清肺气', care: '慢慢吸慢慢呼，把烦恼都呼出去' },
   { icon: '🍋', wisdom: '温水泡柠檬片，维C满满助代谢', care: '少喝饮料多喝这个，妈妈最健康最美' },
-  { icon: '🌸', wisdom: '压力大时，闭眼数十个呼吸，心自然静', care: '有什么事都可以跟一琦说哦，我在的' },
+  { icon: '🌸', wisdom: '压力大时，闭眼数十个呼吸，心自然静', care: '有什么事都可以跟祎琦说哦，我在的' },
   { icon: '🫐', wisdom: '今日宜吃蓝莓，护眼抗氧化越吃越年轻', care: '保护眼睛少看手机，多看美好的事' },
   { icon: '🍯', wisdom: '一小勺蜂蜜加温水，润肠养胃好睡眠', care: '天然的才最好，就像我妈一样自然美' },
   { icon: '🌻', wisdom: '下午加餐几颗核桃，补脑又健康', care: '聪明的妈妈要多补脑，哈哈爱你' },
@@ -31,7 +31,7 @@ const WELLNESS_SIGNS = [
   { icon: '🍓', wisdom: '今日宜吃深色水果，花青素抗氧化', care: '吃得好才能打扮得好，里外都照顾' },
   { icon: '🌙', wisdom: '十一点前入睡，是肝脏自我修复的黄金时间', care: '早点睡，明天的事明天再说，别熬夜' },
   { icon: '🍵', wisdom: '饭前喝小半碗汤，饱感来得早吃得刚好', care: '这个方法我也在用，我们一起健康呀' },
-  { icon: '🌊', wisdom: '今日开窗通风，让新鲜空气流进来', care: '好空气清爽心情，一琦希望你每天这样' },
+  { icon: '🌊', wisdom: '今日开窗通风，让新鲜空气流进来', care: '好空气清爽心情，祎琦希望你每天这样' },
   { icon: '🎋', wisdom: '泡一壶茉莉花茶，排湿气又愉悦心情', care: '花香随着茶香，今天也是美好的一天' },
   { icon: '🥝', wisdom: '自制蔬果汁，新鲜营养不流失', care: '比买的健康多了，妈妈最会养生了' },
   { icon: '🍀', wisdom: '换用橄榄油炒菜，心血管更健康', care: '小小的改变，日积月累对身体好' },
@@ -91,6 +91,7 @@ Page({
     editingPhoto: '',      // 当前显示用的图片 URL（resolved）
     editingPhotoFileId: '', // 原始 cloud:// fileID，用于保存
     editingPhotoPath: '',  // 用户新选的本地路径
+    userRole: '',
     // 养生签
     wellnessSign: WELLNESS_SIGNS[0],
     wellnessOpened: false,
@@ -118,8 +119,15 @@ Page({
     if (getApp().globalData.needSetup) { wx.navigateTo({ url: '/pages/setup/index' }); return; }
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ selected: 0 });
+      // 女儿进来：清掉 Tab 0 角标，更新已读时间
+      if (getUserRole() === 'daughter') {
+        setLastSeen('lastSeenMomRecords');
+        const badges = [...(this.getTabBar().data.badges || [0, 0, 0])];
+        badges[0] = 0;
+        this.getTabBar().setData({ badges });
+      }
     }
-    this.setData({ greeting: getGreeting() });
+    this.setData({ greeting: getGreeting(), userRole: getUserRole() || '' });
     this._initWellness();
     getApp().globalData.binData = null;
     this.load();

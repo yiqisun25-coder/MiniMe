@@ -19,7 +19,34 @@
   gap: 4rpx;
 }
 
+.tab-icon-wrap {
+  position: relative;
+  display: inline-block;
+}
+
 .tab-emoji { font-size: 40rpx; }
+
+.tab-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -16rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  background: #C4706A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6rpx;
+  box-sizing: border-box;
+}
+
+.tab-badge-num {
+  font-size: 18rpx;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1;
+}
 
 .tab-text {
   font-size: 20rpx;

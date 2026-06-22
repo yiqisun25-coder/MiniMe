@@ -1,6 +1,7 @@
 Component({
   data: {
     selected: 0,
+    badges: [0, 0, 0],
     list: [
       { pagePath: '/pages/mom/index',      emoji: '🌸', text: '妈妈的生活' },
       { pagePath: '/pages/together/index', emoji: '💞', text: '我们俩'    },
