@@ -15,6 +15,8 @@ Page({
     avatarSrc: DEFAULT_AVATAR,
     avatarFileId: '',
     avatarUploading: false,
+    daughterName: '',
+    momName: '',
     messages: [],
     loading: true,
     unreadCount: 0,
@@ -69,6 +71,11 @@ Page({
         } catch (_) {}
       }
 
+      const daughterName = data.daughterName || '';
+      const momName = data.momName || '';
+      wx.setStorageSync('daughterName', daughterName);
+      wx.setStorageSync('momName', momName);
+
       this.setData({
         messages,
         unreadCount: messages.filter(m => !m.readByYiqi).length,
@@ -77,6 +84,8 @@ Page({
         letterList,
         avatarSrc,
         avatarFileId,
+        daughterName,
+        momName,
         loading: false,
       });
     } catch (e) {
@@ -169,6 +178,27 @@ Page({
       wx.showToast({ title: '已更新', icon: 'success' });
     } catch (e) {
       wx.showToast({ title: '更新失败', icon: 'none' });
+    }
+  },
+
+  onNameInput(e)    { this.setData({ daughterName: e.detail.value }); },
+  onMomNameInput(e) { this.setData({ momName: e.detail.value }); },
+
+  async saveName() {
+    const daughterName = this.data.daughterName.trim();
+    const momName = this.data.momName.trim();
+    try {
+      const app = getApp();
+      const data = app.globalData.binData || await readData();
+      data.daughterName = daughterName;
+      data.momName = momName;
+      await writeData(data);
+      app.globalData.binData = data;
+      wx.setStorageSync('daughterName', daughterName);
+      wx.setStorageSync('momName', momName);
+      wx.showToast({ title: '已保存 💕', icon: 'success' });
+    } catch (e) {
+      wx.showToast({ title: '保存失败', icon: 'none' });
     }
   },
 

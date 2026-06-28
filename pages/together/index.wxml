@@ -1,6 +1,22 @@
 <view class="container">
+  <!-- 页面标题 -->
+  <view class="page-title-row">
+    <view class="page-title-main">
+      <view class="title-avatar">🌷</view>
+      <view class="title-avatar">🧸</view>
+      <text class="page-title">我们俩</text>
+    </view>
+    <view class="page-stats-bar">
+      <text class="stats-text">和妈妈一起走过的第</text>
+      <text class="stats-num">{{daysTogether}}</text>
+      <text class="stats-text">天</text>
+      <view class="stats-divider"></view>
+      <text class="stats-num">{{photoCount}}</text>
+      <text class="stats-text">张照片</text>
+    </view>
+  </view>
 
-  <!-- 视图切换 -->
+  <!-- 切换 tab -->
   <view class="view-toggle">
     <view class="toggle-btn {{viewMode === 'timeline' ? 'active' : ''}}" data-mode="timeline" bindtap="switchView">
       <text>时间线</text>
@@ -13,6 +29,7 @@
     </view>
   </view>
 
+  <!-- 加载 -->
   <view class="loading" wx:if="{{loading}}">
     <text class="loading-text">加载中…</text>
   </view>
@@ -24,73 +41,103 @@
       <text class="empty-text">这里会记下我们在一起的每一天</text>
     </view>
     <view wx:else>
-      <view wx:for="{{items}}" wx:key="id" class="item">
+      <!-- 日期分组标签 -->
+      <view wx:for="{{items}}" wx:key="id">
+        <view wx:if="{{item.showDateLabel}}" class="date-label">
+          <text class="date-label-text">{{item.dateLabel}}</text>
+        </view>
 
-        <!-- 妈妈的记录 -->
-        <view wx:if="{{item.type === 'mom'}}" class="card card-mom">
-          <view class="card-tag">🌸 妈妈的生活</view>
-          <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
-          <text class="card-text">{{item.text}}</text>
-          <view class="reactions" wx:if="{{item.reactions && item.reactions.length}}">
-            <view wx:for="{{item.reactions}}" wx:for-item="r" wx:key="time"
-                  class="reaction-chip {{r.type === 'text' ? 'chip-text' : 'chip-emoji'}}">
+        <!-- 女儿消息 -->
+        <view wx:if="{{item.type === 'daily'}}" class="timeline-row">
+          <view class="avatar-circle avatar-daughter">🧸</view>
+          <view class="bubble bubble-daughter">
+            <text class="bubble-tag tag-daughter">宝宝来信 📨</text>
+            <text class="bubble-text">{{item.title || item.text}}</text>
+            <view wx:if="{{item.image}}" class="img-ratio-wrap img-4-3">
+              <image class="img-ratio-img" src="{{item.image}}" mode="aspectFill" />
+            </view>
+            <!-- 表情回应 chips -->
+            <view class="emoji-reactions" wx:if="{{item.emojiReactions && item.emojiReactions.length}}">
+              <view wx:for="{{item.emojiReactions}}" wx:for-item="r" wx:key="time" class="reaction-chip">
+                <text>{{r.value}}</text>
+              </view>
+            </view>
+            <!-- 文字回应块 -->
+            <view wx:if="{{item.textReactions && item.textReactions.length}}" class="text-reactions">
+              <view wx:for="{{item.textReactions}}" wx:for-item="r" wx:key="time"
+                class="text-reaction-item"
+                data-id="{{item.id}}" data-type="{{item.type}}" data-ri="{{index}}" data-value="{{r.value}}"
+                bindtap="editTextReaction">
+                <text class="text-reaction-body">{{r.value}}</text>              </view>
+            </view>
+            <view class="bubble-footer">
+              <text class="bubble-time">{{item.shortTime}}</text>
+              <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
+                <text>+ 回应</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 记忆解锁卡片 -->
+        <view wx:elif="{{item.type === 'memory'}}" class="memory-card">
+          <view class="memory-card-header">
+            <text class="memory-icon">🔓</text>
+            <text class="memory-tag">一段记忆刚刚解锁</text>
+          </view>
+          <text class="memory-text">{{item.title || item.text}}</text>
+          <image wx:if="{{item.image}}" class="bubble-image" src="{{item.image}}" mode="aspectFill" />
+          <view class="emoji-reactions" wx:if="{{item.emojiReactions && item.emojiReactions.length}}">
+            <view wx:for="{{item.emojiReactions}}" wx:for-item="r" wx:key="time" class="reaction-chip">
               <text>{{r.value}}</text>
             </view>
           </view>
-          <view class="card-footer">
-            <text wx:if="{{item.mood}}" class="card-mood">{{item.mood}}</text>
-            <text class="card-time footer-time">{{item.timeStr}}</text>
+          <view wx:if="{{item.textReactions && item.textReactions.length}}" class="text-reactions">
+            <view wx:for="{{item.textReactions}}" wx:for-item="r" wx:key="time"
+              class="text-reaction-item"
+              data-id="{{item.id}}" data-type="{{item.type}}" data-ri="{{index}}" data-value="{{r.value}}"
+              bindtap="editTextReaction">
+              <text class="text-reaction-body">{{r.value}}</text>
+              <text class="text-reaction-edit">编辑</text>
+            </view>
+          </view>
+          <view class="bubble-footer">
+            <text class="bubble-time">{{item.shortTime}}</text>
             <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
-              <text class="reaction-add-label">+ 回应</text>
+              <text>+ 回应</text>
             </view>
           </view>
         </view>
 
-        <!-- 我的日常 -->
-        <view wx:if="{{item.type === 'daily'}}" class="card card-daily">
-          <view class="card-tag">📨 宝宝来信</view>
-          <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
-          <text class="card-text">{{item.text}}</text>
-          <view class="reactions" wx:if="{{item.reactions && item.reactions.length}}">
-            <view wx:for="{{item.reactions}}" wx:for-item="r" wx:key="time"
-                  class="reaction-chip {{r.type === 'text' ? 'chip-text' : 'chip-emoji'}}">
-              <text>{{r.value}}</text>
+        <!-- 妈妈日记 -->
+        <view wx:else class="timeline-row">
+          <view class="avatar-circle avatar-mom">🌷</view>
+          <view class="bubble bubble-mom">
+            <text class="bubble-tag tag-mom">妈妈的生活 📒 · {{item.mood || ''}}</text>
+            <text class="bubble-text">{{item.title || item.text}}</text>
+            <view wx:if="{{item.image}}" class="img-ratio-wrap img-4-3">
+              <image class="img-ratio-img" src="{{item.image}}" mode="aspectFill" />
             </view>
-          </view>
-          <view class="card-footer">
-            <text class="card-time footer-time">{{item.timeStr}}</text>
-            <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
-              <text class="reaction-add-label">+ 回应</text>
+            <view class="emoji-reactions" wx:if="{{item.emojiReactions && item.emojiReactions.length}}">
+              <view wx:for="{{item.emojiReactions}}" wx:for-item="r" wx:key="time" class="reaction-chip">
+                <text>{{r.value}}</text>
+              </view>
             </view>
-          </view>
-        </view>
-
-        <!-- 记忆 - 已解锁 -->
-        <view wx:if="{{item.type === 'memory' && item.unlocked}}" class="card card-memory">
-          <view class="card-tag">✨ 解锁的记忆</view>
-          <image wx:if="{{item.image}}" class="card-image" src="{{item.image}}" mode="aspectFill" />
-          <text class="card-title">{{item.title}}</text>
-          <text class="card-text">{{item.text}}</text>
-          <view class="reactions" wx:if="{{item.reactions && item.reactions.length}}">
-            <view wx:for="{{item.reactions}}" wx:for-item="r" wx:key="time"
-                  class="reaction-chip {{r.type === 'text' ? 'chip-text' : 'chip-emoji'}}">
-              <text>{{r.value}}</text>
+            <view wx:if="{{item.textReactions && item.textReactions.length}}" class="text-reactions">
+              <view wx:for="{{item.textReactions}}" wx:for-item="r" wx:key="time"
+                class="text-reaction-item"
+                data-id="{{item.id}}" data-type="{{item.type}}" data-ri="{{index}}" data-value="{{r.value}}"
+                bindtap="editTextReaction">
+                <text class="text-reaction-body">{{r.value}}</text>              </view>
             </view>
-          </view>
-          <view class="card-footer">
-            <text class="card-time footer-time">{{item.timeStr}}</text>
-            <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
-              <text class="reaction-add-label">+ 回应</text>
+            <view class="bubble-footer">
+              <text class="bubble-time">{{item.shortTime}}</text>
+              <view class="reaction-add" data-id="{{item.id}}" data-type="{{item.type}}" bindtap="openReaction">
+                <text>+ 回应</text>
+              </view>
             </view>
           </view>
         </view>
-
-        <!-- 记忆 - 未解锁 -->
-        <view wx:if="{{item.type === 'memory' && !item.unlocked}}" class="card card-locked">
-          <view class="card-tag">🔒 还没到时候</view>
-          <text class="locked-date">{{item.unlockDate}} 解锁</text>
-        </view>
-
       </view>
     </view>
   </view>
@@ -102,55 +149,121 @@
       <text class="empty-text">还没有带图片的记录</text>
     </view>
     <view class="photo-grid" wx:else>
-      <view wx:for="{{photos}}" wx:key="id" class="polaroid" style="transform: rotate({{item.tilt}}deg)">
-        <image class="polaroid-img" src="{{item.image}}" mode="aspectFill" />
-        <view class="polaroid-caption">
+      <view wx:for="{{photos}}" wx:key="id" class="polaroid">
+        <view class="polaroid-inner" style="transform:rotate({{item.tilt}}deg)">
+          <text style="{{item.decoStyle}}">{{item.decoText}}</text>
+          <view class="polaroid-img-wrap">
+            <image class="polaroid-img" src="{{item.image}}" mode="aspectFill"/>
+            <text class="polaroid-date-overlay">{{item.timeStr}}</text>
+          </view>
           <text class="polaroid-text">{{item.caption}}</text>
-          <text class="polaroid-date">{{item.timeStr}}</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 回应弹窗 -->
-  <view class="picker-mask" wx:if="{{pickerVisible}}" bindtap="closeReaction">
-    <view class="picker-sheet" catchtap="">
-      <view class="picker-handle"></view>
+  <!-- 女儿写信 FAB -->
+  <view wx:if="{{userRole === 'daughter'}}" class="compose-fab" bindtap="openCompose">
+    <text class="compose-fab-icon">✉️</text>
+  </view>
 
-      <!-- 已有回应 -->
-      <view wx:if="{{pickerReactions.length}}">
+  <!-- 女儿写信面板 -->
+  <view class="picker-mask" wx:if="{{composeVisible}}" bindtap="onComposeMaskTap">
+    <view class="picker-sheet" catchtap="noop">
+      <view class="picker-top-row">
+        <view class="picker-handle"></view>
+        <view class="picker-close-btn" bindtap="closeCompose"><text>✕</text></view>
+      </view>
+      <view class="picker-section-label">给妈妈写封信 📨</view>
+      <view class="picker-input-row" style="align-items:flex-start;padding:20rpx;">
+        <textarea
+          class="picker-textarea"
+          style="min-height:160rpx;"
+          placeholder="今天想说什么…"
+          placeholder-class="picker-placeholder"
+          value="{{composeText}}"
+          bindinput="onComposeInput"
+          bindfocus="onComposeFocus"
+          bindblur="onComposeBlur"
+          maxlength="500"
+          auto-height
+          cursor-spacing="120"
+        />
+      </view>
+      <!-- 已选照片 -->
+      <view wx:if="{{composePhoto}}" class="compose-photo-wrap" bindtap="chooseComposePhoto">
+        <view class="img-ratio-wrap img-4-3">
+          <image class="img-ratio-img" src="{{composePhoto}}" mode="aspectFill"/>
+        </view>
+        <view class="compose-photo-remove" catchtap="removeComposePhoto"><text>×</text></view>
+      </view>
+      <!-- 底部操作行 -->
+      <view class="compose-action-row">
+        <view class="compose-photo-btn" bindtap="chooseComposePhoto">
+          <text>📷 加照片</text>
+        </view>
+        <view class="compose-send-btn {{(composeSending || !composeText) ? 'disabled' : ''}}" bindtap="submitCompose">
+          <text>{{composeSending ? '发送中…' : '发给妈妈 💕'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 回应面板 -->
+  <view class="picker-mask" wx:if="{{pickerVisible}}" bindtap="onMaskTap">
+    <view class="picker-sheet" catchtap="noop">
+
+      <!-- 顶部：拖动条 + 关闭按钮 -->
+      <view class="picker-top-row">
+        <view class="picker-handle"></view>
+        <view class="picker-close-btn" bindtap="closeReaction"><text>✕</text></view>
+      </view>
+
+      <!-- 已有回应（可删除） -->
+      <block wx:if="{{pickerReactions.length}}">
+        <view class="picker-section-label">已有回应</view>
         <view class="picker-existing-row">
-          <view wx:for="{{pickerReactions}}" wx:for-item="r" wx:for-index="ri" wx:key="time"
-                class="picker-existing-chip">
+          <view wx:for="{{pickerReactions}}" wx:for-item="r" wx:key="time" class="picker-existing-chip">
             <text>{{r.value}}</text>
-            <text class="picker-existing-del" data-ri="{{ri}}" catchtap="deleteReactionFromPicker">×</text>
+            <text class="picker-existing-del" data-ri="{{index}}" catchtap="deleteReactionFromPicker">×</text>
           </view>
         </view>
         <view class="picker-divider"></view>
-      </view>
+      </block>
 
+      <!-- 快速表情 -->
+      <view class="picker-section-label">表情回应</view>
       <view class="picker-emoji-row">
-        <view wx:for="{{emojis}}" wx:key="*this" class="picker-emoji-btn"
-              data-emoji="{{item}}" bindtap="tapEmoji">
+        <view wx:for="{{emojis}}" wx:key="*this" class="picker-emoji-btn" data-emoji="{{item}}" bindtap="tapEmoji">
           <text>{{item}}</text>
         </view>
       </view>
+
       <view class="picker-divider"></view>
-      <view class="picker-text-row">
-        <input
-          class="picker-input"
-          placeholder="说点什么…"
+
+      <!-- 文字回应 -->
+      <view class="picker-section-label">{{editingReactionRi >= 0 ? '修改回应' : '写点什么'}}</view>
+      <view class="picker-input-row">
+        <view wx:if="{{editingReactionRi >= 0}}" class="picker-delete-btn" catchtap="deleteEditingReaction">
+          <text>删除</text>
+        </view>
+        <textarea
+          class="picker-textarea"
+          placeholder="写点什么给她…"
           placeholder-class="picker-placeholder"
           value="{{pickerText}}"
           bindinput="onPickerTextInput"
-          confirm-type="send"
-          bindconfirm="submitText"
+          bindfocus="onPickerFocus"
+          bindblur="onPickerBlur"
+          maxlength="200"
+          auto-height
+          cursor-spacing="120"
         />
-        <view class="picker-send-btn" bindtap="submitText">
-          <text>发</text>
+        <view class="picker-send-btn" catchtap="submitText">
+          <text>{{editingReactionRi >= 0 ? '存' : '发'}}</text>
         </view>
       </view>
+
     </view>
   </view>
-
 </view>

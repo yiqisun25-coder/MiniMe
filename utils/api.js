@@ -5,6 +5,8 @@ const EMPTY_DATA = {
   myDaily: [],
   memories: [],
   avatarFileId: '',
+  daughterName: '',
+  momName: '',
 };
 
 function getDB() {
@@ -58,46 +60,33 @@ async function writeData(data) {
   return data;
 }
 
-// 女儿创建家庭：支持自定义码或自动生成，自动迁移旧数据
-async function createFamily(customCode) {
+// 女儿创建家庭：支持自定义码或自动生成
+async function createFamily(customCode, extraData = {}) {
   const db = getDB();
-
-  // 尝试读取旧格式数据（迁移）
-  let oldData = null;
-  try {
-    const old = await db.collection('minime').doc('minime_data').get();
-    if (old.data) {
-      const { _id, _openid, ...rest } = old.data;
-      oldData = rest;
-    }
-  } catch (_) {}
-
   const code = customCode ? customCode.toUpperCase() : generateCode();
 
   try {
     await db.collection('minime').add({
-      data: { _id: code, ...(oldData || EMPTY_DATA) },
+      data: { _id: code, ...EMPTY_DATA, ...extraData },
     });
   } catch (e) {
-    // add 失败通常是 _id 冲突（码已被用）
     const msg = e.message || e.errMsg || '';
     if (msg.includes('duplicate') || msg.includes('existed') || msg.includes('unique')) {
       throw new Error('code_taken');
     }
-    // 随机码冲突：再试一次
     if (!customCode) {
       const retry = generateCode();
       await db.collection('minime').add({
-        data: { _id: retry, ...(oldData || EMPTY_DATA) },
+        data: { _id: retry, ...EMPTY_DATA, ...extraData },
       });
       setFamilyCode(retry);
-      return { code: retry, migrated: !!oldData };
+      return { code: retry, migrated: false };
     }
     throw e;
   }
 
   setFamilyCode(code);
-  return { code, migrated: !!oldData };
+  return { code, migrated: false };
 }
 
 // 妈妈加入：输入邀请码连接

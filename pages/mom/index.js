@@ -98,6 +98,7 @@ Page({
     // 开屏
     showSplash: false,
     splashFading: false,
+    daysTogether: 0,
     // 新建表单时间
     today: '',
     selectedDate: '',
@@ -105,18 +106,39 @@ Page({
   },
 
   onLoad() {
-    this.setData({ today: getTodayStr(), selectedDate: getTodayStr(), selectedTime: getNowTimeStr() });
+    const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
+    const days = Math.floor((Date.now() - new Date(savedStart).getTime()) / 86400000) + 1;
+    this.setData({ today: getTodayStr(), selectedDate: getTodayStr(), selectedTime: getNowTimeStr(), daysTogether: days.toLocaleString('zh-CN') });
     const app = getApp();
     if (!app.globalData.splashShown) {
       app.globalData.splashShown = true;
       this.setData({ showSplash: true });
-      setTimeout(() => this.setData({ splashFading: true }), 1400);
-      setTimeout(() => this.setData({ showSplash: false, splashFading: false }), 2000);
+      if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: true });
+      this._splashTimer1 = setTimeout(() => this.setData({ splashFading: true }), 3000);
+      this._splashTimer2 = setTimeout(() => {
+        this.setData({ showSplash: false, splashFading: false });
+        if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: false });
+      }, 3600);
     }
   },
 
   onShow() {
     if (getApp().globalData.needSetup) { wx.navigateTo({ url: '/pages/setup/index' }); return; }
+    // setup 完成后播放开屏动画
+    const app = getApp();
+    if (app.globalData.showSplashOnNext) {
+      app.globalData.showSplashOnNext = false;
+      app.globalData.splashShown = true;
+      const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
+      const days = Math.floor((Date.now() - new Date(savedStart).getTime()) / 86400000) + 1;
+      this.setData({ showSplash: true, splashFading: false, daysTogether: days.toLocaleString('zh-CN') });
+      if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: true });
+      this._splashTimer1 = setTimeout(() => this.setData({ splashFading: true }), 3000);
+      this._splashTimer2 = setTimeout(() => {
+        this.setData({ showSplash: false, splashFading: false });
+        if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: false });
+      }, 3600);
+    }
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ selected: 0 });
       // 女儿进来：清掉 Tab 0 角标，更新已读时间
@@ -168,7 +190,14 @@ Page({
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
       records = await this._resolveImages(records);
-      this.setData({ records, loading: false });
+
+      // 用真实名字替换养生签里的占位名
+      const name = data.daughterName || wx.getStorageSync('daughterName') || '祎琦';
+      wx.setStorageSync('daughterName', name);
+      const sign = getDailySign();
+      const wellnessSign = { ...sign, care: sign.care.replace(/祎琦/g, name) };
+
+      this.setData({ records, loading: false, wellnessSign });
     } catch (e) {
       console.error('load error:', e);
       this.setData({ loading: false });
@@ -355,6 +384,16 @@ Page({
   },
 
   dismissResponse() { this.setData({ showResponse: false }); },
+
+  onSplashTap() {
+    clearTimeout(this._splashTimer1);
+    clearTimeout(this._splashTimer2);
+    this.setData({ splashFading: true });
+    setTimeout(() => {
+      this.setData({ showSplash: false, splashFading: false });
+      if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: false });
+    }, 600);
+  },
 
   onWellnessTap() {
     if (this.data.wellnessOpened) return;
