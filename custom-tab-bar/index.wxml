@@ -1,4 +1,4 @@
-<view class="tab-bar">
+<view class="tab-bar" wx:if="{{!hidden}}">
   <view
     wx:for="{{list}}"
     wx:key="pagePath"
@@ -7,10 +7,15 @@
     bindtap="switchTab"
   >
     <view class="tab-icon-wrap">
-      <text class="tab-emoji">{{item.emoji}}</text>
+      <image
+        class="tab-icon"
+        src="{{selected === index ? item.iconActive : item.icon}}"
+        mode="aspectFit"
+      />
       <view class="tab-badge" wx:if="{{badges[index] > 0}}">
         <text class="tab-badge-num">{{badges[index]}}</text>
       </view>
     </view>
+    <text class="tab-text">{{item.text}}</text>
   </view>
 </view>

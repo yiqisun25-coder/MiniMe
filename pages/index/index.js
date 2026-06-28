@@ -3,16 +3,16 @@ const { readData, getUserRole, getLastSeen } = require('../../utils/api');
 const DEFAULT_AVATAR = '/images/default_avatar.jpg';
 
 const PHOTOS = {
-  main:    '/images/me_main.jpeg',
-  morning: '/images/me_morning.jpeg',
-  night:   '/images/me_night.jpeg',
-  miss:    '/images/me_miss.jpeg',
-  secret:  '/images/me_secret.jpeg',
+  main:    DEFAULT_AVATAR,
+  morning: DEFAULT_AVATAR,
+  night:   DEFAULT_AVATAR,
+  miss:    DEFAULT_AVATAR,
+  secret:  DEFAULT_AVATAR,
 };
 
 const SCENES = {
   morning: {
-    label: '早安', emoji: '☀️', desc: '元气满满叫你起床',
+    label: '早安', emoji: '🌤️', desc: '道一声早',
     responses: [
       '妈！早上好呀 ☀️ 昨晚睡得好不好？今天也要元气满满哦',
       '起床啦~ 今天也要美美的，我妈最好看了 💕',
@@ -21,7 +21,7 @@ const SCENES = {
     ],
   },
   night: {
-    label: '晚安', emoji: '🌙', desc: '好好休息，我想你了',
+    label: '晚安', emoji: '🌛', desc: '说句晚安',
     responses: [
       '妈，晚安 🌙 今天辛苦了，快去好好休息',
       '晚安晚安，今天有没有什么开心的事呀？💭',
@@ -30,7 +30,7 @@ const SCENES = {
     ],
   },
   miss: {
-    label: '想你了', emoji: '💭', desc: '就是想说说话',
+    label: '想你了', emoji: '💗', desc: '轻轻抱抱',
     responses: [
       '妈，我想你了 💕 也不是很想，就是突然特别想',
       '就是想跟你说一声，我想你 🥹 没别的意思就是想',
@@ -39,7 +39,7 @@ const SCENES = {
     ],
   },
   secret: {
-    label: '悄悄话', emoji: '🤫', desc: '偷偷告诉你一件事',
+    label: '悄悄话', emoji: '💬', desc: '留个口信',
     responses: [
       '嘘~ 偷偷告诉你，你是我见过最好的妈妈 🤫',
       '悄悄说：我觉得我妈比所有人的妈妈都好，这是秘密',
@@ -51,11 +51,19 @@ const SCENES = {
 
 function getGreeting() {
   const h = new Date().getHours();
-  if (h >= 5  && h < 12) return '早上好 ☀️';
-  if (h >= 12 && h < 14) return '中午好 🌤️';
-  if (h >= 14 && h < 18) return '下午好 🌤️';
-  if (h >= 18 && h < 22) return '晚上好 🌙';
+  if (h >= 5  && h < 12) return '早安，妈妈 ☀';
+  if (h >= 12 && h < 14) return '中午好，妈妈 🌤️';
+  if (h >= 14 && h < 18) return '下午好，妈妈 🌤️';
+  if (h >= 18 && h < 22) return '晚上好，妈妈 🌙';
   return '又是元气满满的一天呢！';
+}
+
+function getHeroDate() {
+  const now = new Date();
+  const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][now.getDay()];
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  return `${weekday} · ${month}月${day}日 · 晴`;
 }
 
 Page({
@@ -63,6 +71,8 @@ Page({
     avatarSrc: PHOTOS.main,
     uploadedAvatar: '',   // 云端上传的头像 URL（有则覆盖 PHOTOS）
     greeting: '',
+    heroDate: '',
+    today: '',
     scenes: Object.entries(SCENES).map(([key, s]) => ({
       key, label: s.label, emoji: s.emoji, desc: s.desc,
     })),
@@ -81,7 +91,9 @@ Page({
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ selected: 2 });
     }
-    this.setData({ greeting: getGreeting() });
+    const now = new Date();
+    const monthDay = `${now.getMonth() + 1}月${now.getDate()}日`;
+    this.setData({ greeting: getGreeting(), heroDate: getHeroDate(), today: monthDay });
     this._loadData();
   },
 
@@ -122,6 +134,10 @@ Page({
 
   goToMailbox() {
     wx.navigateTo({ url: '/pages/mailbox/index' });
+  },
+
+  onWellnessTap() {
+    wx.showToast({ title: '轻触卡片，解锁提醒', icon: 'none' });
   },
 
   onAvatarTap() {

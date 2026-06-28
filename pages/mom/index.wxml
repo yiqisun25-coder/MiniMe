@@ -1,175 +1,249 @@
 <!-- 开屏动画 -->
 <view wx:if="{{showSplash}}" class="splash {{splashFading ? 'splash-out' : 'splash-in'}}">
-  <view class="splash-content">
-    <text class="splash-emoji">💕</text>
-    <text class="splash-title">我在这里</text>
-    <text class="splash-sub">今天也是值得记录的一天呀！</text>
+  <view class="splash-bg">
+
+    <!-- 太阳 -->
+    <view class="s-sun">
+      <view class="s-sun-face">
+        <view class="s-eye s-eye-l"></view>
+        <view class="s-eye s-eye-r"></view>
+        <view class="s-smile"></view>
+      </view>
+      <!-- 光芒 -->
+      <view class="s-ray s-ray-1"></view>
+      <view class="s-ray s-ray-2"></view>
+      <view class="s-ray s-ray-3"></view>
+      <view class="s-ray s-ray-4"></view>
+      <view class="s-ray s-ray-5"></view>
+      <view class="s-ray s-ray-6"></view>
+      <view class="s-ray s-ray-7"></view>
+      <view class="s-ray s-ray-8"></view>
+    </view>
+
+    <!-- 云朵 -->
+    <view class="s-cloud s-cloud-1">
+      <view class="s-cloud-body"></view>
+      <view class="s-cloud-puff s-puff-1"></view>
+      <view class="s-cloud-puff s-puff-2"></view>
+    </view>
+    <view class="s-cloud s-cloud-2">
+      <view class="s-cloud-body"></view>
+      <view class="s-cloud-puff s-puff-1"></view>
+      <view class="s-cloud-puff s-puff-2"></view>
+    </view>
+
+    <!-- 山丘层 -->
+    <view class="s-hills">
+      <view class="s-hill s-hill-far-l"></view>
+      <view class="s-hill s-hill-far-r"></view>
+      <view class="s-hill s-hill-mid-l"></view>
+      <view class="s-hill s-hill-mid-r"></view>
+      <view class="s-hill s-hill-front"></view>
+      <view class="s-hill s-hill-shadow-l"></view>
+      <view class="s-hill s-hill-shadow-r"></view>
+
+      <!-- 左树 -->
+      <view class="s-tree s-tree-l">
+        <view class="s-trunk"></view>
+        <view class="s-crown s-crown-b"></view>
+        <view class="s-crown s-crown-t"></view>
+      </view>
+      <!-- 右树 -->
+      <view class="s-tree s-tree-r">
+        <view class="s-trunk"></view>
+        <view class="s-crown s-crown-b"></view>
+        <view class="s-crown s-crown-t"></view>
+      </view>
+      <!-- 小房子 -->
+      <view class="s-house">
+        <view class="s-roof"></view>
+        <view class="s-chimney"></view>
+        <view class="s-wall">
+          <view class="s-door"></view>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 文字区 -->
+  <view class="s-center">
+    <text class="s-title">我在这里</text>
+    <view class="s-sub-row">
+      <view class="s-sub-line"></view>
+      <text class="s-sub">妈妈，今天也想你了</text>
+      <view class="s-sub-line"></view>
+    </view>
+    <text class="s-en">I'M HERE WITH YOU</text>
+  </view>
+
+  <!-- 按钮 -->
+  <view class="s-btn-wrap" bindtap="onSplashTap">
+    <view class="s-btn">
+      <text class="s-btn-text">轻轻推开门 →</text>
+    </view>
+    <text class="s-days-text">和妈妈一起走过的第 {{daysTogether}} 天</text>
   </view>
 </view>
 
+<!-- 主内容 -->
 <view class="container">
-
-  <!-- 上：居中区 -->
-  <view class="hero">
-
-    <!-- 今日养生签 -->
-    <view class="wellness-card" bindtap="onWellnessTap">
-      <text class="wellness-icon">{{wellnessSign.icon}}</text>
-      <text class="wellness-tag">今日养生签</text>
-      <text class="wellness-wisdom {{wellnessOpened ? '' : 'sealed'}}">
-        {{wellnessOpened ? wellnessSign.wisdom : '轻触解锁今日签'}}
-      </text>
-      <text class="wellness-care" wx:if="{{wellnessOpened}}">— {{wellnessSign.care}}</text>
+  <!-- 顶部 header -->
+  <view class="header">
+    <view class="header-left">
+      <text class="header-date">SAT · {{today}} · 晴</text>
+      <text class="header-greeting">{{greeting}}</text>
     </view>
-
-    <!-- 问候 -->
-    <text class="greeting-text">{{greeting}}</text>
-
+    <view class="header-avatar" bindtap="onWellnessTap">🌷</view>
   </view>
 
-  <!-- 分隔 -->
-  <view class="section-sep">
-    <view class="sep-line"></view>
-    <text class="sep-label">今日记录</text>
-    <view class="sep-line"></view>
+  <!-- 养生签卡片 -->
+  <view class="wellness-card" bindtap="onWellnessTap">
+    <view class="wellness-circle-bg"></view>
+    <view class="wellness-circle-sm"></view>
+    <view class="wellness-chip">
+      <text class="wellness-chip-text">今日养生签 · 第 {{wellnessSign.no || 128}} 签</text>
+    </view>
+    <text class="wellness-wisdom">{{wellnessOpened ? wellnessSign.wisdom : '早起喝杯温水，\n给肠胃一个温柔的早安。'}}</text>
+    <view class="wellness-tip-row">
+      <view class="wellness-tip-icon">🔓</view>
+      <text class="wellness-tip-text">轻触卡片，解锁今天的小提醒</text>
+    </view>
   </view>
 
-  <!-- 下：日记区 -->
-  <view class="diary">
-
-    <!-- 记一下入口 -->
-    <view class="add-btn {{showForm ? 'cancel' : ''}}" bindtap="toggleForm">
-      <text>{{showForm ? '× 取消' : '+ 记一下'}}</text>
-    </view>
-
-    <!-- 新增表单 -->
-    <view class="form-card" wx:if="{{showForm}}">
-      <view class="mood-row">
-        <view
-          wx:for="{{moods}}"
-          wx:key="label"
-          class="mood-item {{selectedMood === index ? 'selected' : ''}}"
-          data-index="{{index}}"
-          bindtap="selectMood"
-        >
-          <text class="mood-emoji">{{item.emoji}}</text>
-          <text class="mood-label">{{item.label}}</text>
-        </view>
-      </view>
-      <textarea
-        class="textarea"
-        placeholder="今天想记点什么…"
-        placeholder-class="placeholder"
-        value="{{inputText}}"
-        bindinput="onTextInput"
-        maxlength="300"
-        auto-height
-      />
-      <view class="char-count">{{inputText.length}}/300</view>
-      <!-- 时间选择 -->
-      <view class="date-row">
-        <picker mode="date" value="{{selectedDate}}" end="{{today}}" bindchange="onDateChange">
-          <view class="date-picker-btn">
-            <text class="date-icon">📅</text>
-            <text class="date-text">{{selectedDate === today ? '今天' : selectedDate}}</text>
-          </view>
-        </picker>
-        <picker mode="time" value="{{selectedTime}}" bindchange="onTimeChange">
-          <view class="date-picker-btn">
-            <text class="date-icon">🕐</text>
-            <text class="date-text">{{selectedTime}}</text>
-          </view>
-        </picker>
-      </view>
-      <!-- 可选照片 -->
-      <view class="photo-picker" bindtap="choosePhoto">
-        <view wx:if="{{!photoPath}}" class="photo-placeholder">
-          <text class="photo-icon">📷</text>
-          <text class="photo-hint">加一张照片（可选）</text>
-        </view>
-        <image wx:else class="photo-preview" src="{{photoPath}}" mode="aspectFill" />
-      </view>
-      <view class="submit-btn {{(!inputText || submitting) ? 'disabled' : ''}}" bindtap="onSubmit">
-        <text>{{submitting ? '存中…' : '存下来 💕'}}</text>
-      </view>
-    </view>
-
-    <!-- 记录列表 -->
-    <view class="loading" wx:if="{{loading}}">
-      <text class="loading-text">加载中…</text>
-    </view>
-    <view class="empty" wx:elif="{{!loading && records.length === 0 && !showForm}}">
-      <text class="empty-icon">🌸</text>
-      <text class="empty-text">还没有记录，来记一下今天吧</text>
-    </view>
-    <view wx:elif="{{!showForm}}">
-      <view wx:for="{{records}}" wx:key="id" class="record-card">
-
-        <view wx:if="{{editingId !== item.id}}">
-          <view class="record-top">
-            <text class="record-time">{{item.timeStr}}</text>
-            <text class="record-mood" wx:if="{{item.mood}}">{{item.mood}}</text>
-          </view>
-          <image wx:if="{{item.image}}" class="record-image" src="{{item.image}}" mode="aspectFill" />
-          <text class="record-text">{{item.text}}</text>
-          <view class="record-actions" wx:if="{{userRole === 'mom'}}">
-            <view class="action-edit" data-id="{{item.id}}" bindtap="startEdit">
-              <text>✏️ 编辑</text>
-            </view>
-            <view class="action-delete" data-id="{{item.id}}" bindtap="deleteRecord">
-              <text>🗑️ 删除</text>
-            </view>
-          </view>
-        </view>
-
-        <view wx:else>
-          <view class="mood-row">
-            <view
-              wx:for="{{moods}}"
-              wx:for-item="mood"
-              wx:key="label"
-              class="mood-item {{editingMood === index ? 'selected' : ''}}"
-              data-index="{{index}}"
-              bindtap="selectEditMood"
-            >
-              <text class="mood-emoji">{{mood.emoji}}</text>
-              <text class="mood-label">{{mood.label}}</text>
-            </view>
-          </view>
-          <textarea
-            class="textarea"
-            value="{{editingText}}"
-            bindinput="onEditInput"
-            maxlength="300"
-            auto-height
-          />
-          <!-- 照片编辑 -->
-          <view class="photo-picker" style="margin-top:20rpx" bindtap="editChoosePhoto">
-            <view wx:if="{{!editingPhoto}}" class="photo-placeholder">
-              <text class="photo-icon">📷</text>
-              <text class="photo-hint">加一张照片（可选）</text>
-            </view>
-            <view wx:else class="edit-photo-wrap">
-              <image class="photo-preview" src="{{editingPhoto}}" mode="aspectFill" />
-              <view class="edit-photo-remove" catchtap="editRemovePhoto">×</view>
-            </view>
-          </view>
-          <view class="edit-actions">
-            <view class="action-cancel" bindtap="cancelEdit"><text>取消</text></view>
-            <view class="action-save"   bindtap="saveEdit"  ><text>保存</text></view>
-          </view>
-        </view>
-
-      </view>
-    </view>
-
+  <!-- 分区标题 -->
+  <view class="section-header">
+    <text class="section-title">妈妈的生活</text>
+    <text class="section-more">全部 ›</text>
   </view>
 
-  <!-- 温暖回应浮层 -->
+  <!-- 快捷记录入口 -->
+  <view class="quick-entry" bindtap="toggleForm">
+    <view class="quick-icon-box">
+      <text class="quick-icon">✏️</text>
+    </view>
+    <text class="quick-text">{{showForm ? '× 取消编辑' : '今天想记点什么呢…'}}</text>
+  </view>
+
+  <!-- 记录表单 -->
+  <view class="form-card" wx:if="{{showForm}}">
+    <view class="mood-row">
+      <view
+        wx:for="{{moods}}"
+        wx:key="label"
+        class="mood-item {{selectedMood === index ? 'selected' : ''}}"
+        data-index="{{index}}"
+        bindtap="selectMood"
+      >
+        <text class="mood-emoji">{{item.emoji}}</text>
+        <text class="mood-label">{{item.label}}</text>
+      </view>
+    </view>
+    <textarea
+      class="textarea"
+      placeholder="今天想记点什么…"
+      placeholder-class="placeholder"
+      value="{{inputText}}"
+      bindinput="onTextInput"
+      maxlength="300"
+      auto-height
+    />
+    <text class="char-count">{{inputText.length}}/300</text>
+    <view class="date-row">
+      <picker mode="date" value="{{selectedDate}}" end="{{today}}" bindchange="onDateChange">
+        <view class="date-picker-btn">
+          <text class="date-icon">📅</text>
+          <text class="date-text">{{selectedDate === today ? '今天' : selectedDate}}</text>
+        </view>
+      </picker>
+      <picker mode="time" value="{{selectedTime}}" bindchange="onTimeChange">
+        <view class="date-picker-btn">
+          <text class="date-icon">🕐</text>
+          <text class="date-text">{{selectedTime}}</text>
+        </view>
+      </picker>
+    </view>
+    <view class="photo-picker" bindtap="choosePhoto">
+      <view wx:if="{{!photoPath}}" class="photo-placeholder">
+        <text class="photo-hint">📷 加一张照片（可选）</text>
+      </view>
+      <image wx:else class="photo-preview" src="{{photoPath}}" mode="aspectFill" />
+    </view>
+    <view class="submit-btn {{(!inputText || submitting) ? 'disabled' : ''}}" bindtap="onSubmit">
+      <text>{{submitting ? '存中…' : '存下来 💕'}}</text>
+    </view>
+  </view>
+
+  <!-- 加载 / 空状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中…</text>
+  </view>
+  <view class="empty" wx:elif="{{!loading && records.length === 0 && !showForm}}">
+    <text class="empty-icon">🌸</text>
+    <text class="empty-text">妈妈还没有写今天的日记哦</text>
+  </view>
+
+  <!-- 日记列表 -->
+  <view wx:elif="{{!showForm}}">
+    <view wx:for="{{records}}" wx:key="id" class="record-card">
+      <view wx:if="{{editingId !== item.id}}">
+        <view class="record-top">
+          <view class="record-mood-chip {{item.moodKey}}">
+            <text>{{item.mood || '📝 记录'}}</text>
+          </view>
+          <text class="record-time">{{item.timeStr}}</text>
+        </view>
+        <view wx:if="{{item.image}}" class="img-ratio-wrap img-4-3">
+          <image class="img-ratio-img" src="{{item.image}}" mode="aspectFill" />
+        </view>
+        <text class="record-text">{{item.text}}</text>
+        <view class="record-actions" wx:if="{{userRole === 'mom'}}">
+          <view class="action-edit" data-id="{{item.id}}" bindtap="startEdit"><text>✏️ 编辑</text></view>
+          <view class="action-delete" data-id="{{item.id}}" bindtap="deleteRecord"><text>🗑️ 删除</text></view>
+        </view>
+      </view>
+      <view wx:else>
+        <view class="mood-row">
+          <view
+            wx:for="{{moods}}"
+            wx:for-item="mood"
+            wx:key="label"
+            class="mood-item {{editingMood === index ? 'selected' : ''}}"
+            data-index="{{index}}"
+            bindtap="selectEditMood"
+          >
+            <text class="mood-emoji">{{mood.emoji}}</text>
+            <text class="mood-label">{{mood.label}}</text>
+          </view>
+        </view>
+        <textarea
+          class="textarea"
+          value="{{editingText}}"
+          bindinput="onEditInput"
+          maxlength="300"
+          auto-height
+        />
+        <view class="photo-picker" style="margin-top:20rpx" bindtap="editChoosePhoto">
+          <view wx:if="{{!editingPhoto}}" class="photo-placeholder">
+            <text class="photo-hint">📷 加一张照片（可选）</text>
+          </view>
+          <view wx:else class="edit-photo-wrap">
+            <image class="photo-preview" src="{{editingPhoto}}" mode="aspectFill" />
+            <view class="edit-photo-remove" catchtap="editRemovePhoto">×</view>
+          </view>
+        </view>
+        <view class="edit-actions">
+          <view class="action-cancel" bindtap="cancelEdit"><text>取消</text></view>
+          <view class="action-save" bindtap="saveEdit"><text>保存</text></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 回应弹层 -->
   <view class="response-overlay {{showResponse ? 'show' : ''}}" bindtap="dismissResponse">
     <view class="response-card">
       <text class="response-text">{{warmResponse}}</text>
     </view>
   </view>
-
 </view>

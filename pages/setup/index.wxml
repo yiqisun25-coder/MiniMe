@@ -29,7 +29,7 @@
 
     <input
       class="code-input"
-      placeholder="比如 MAMA66"
+      placeholder="留空自动生成，或比如 MAMA66"
       placeholder-class="code-placeholder"
       value="{{customCode}}"
       bindinput="onCustomCodeInput"
@@ -37,6 +37,35 @@
       focus="{{true}}"
     />
     <text class="input-hint">4-8位，字母或数字，不区分大小写</text>
+
+    <text class="name-label">妈妈叫我</text>
+    <input
+      class="name-input"
+      placeholder="比如 祎琦"
+      placeholder-class="code-placeholder"
+      value="{{daughterName}}"
+      bindinput="onNameInput"
+      maxlength="10"
+    />
+
+    <text class="name-label">我叫妈妈</text>
+    <input
+      class="name-input"
+      placeholder="比如 妈妈"
+      placeholder-class="code-placeholder"
+      value="{{momName}}"
+      bindinput="onMomNameInput"
+      maxlength="10"
+    />
+
+    <text class="name-label">我们从哪天开始算 💛</text>
+    <picker mode="date" value="{{startDate}}" end="{{today}}" bindchange="onStartDateChange">
+      <view class="date-picker-row">
+        <text class="date-picker-icon">📅</text>
+        <text class="date-picker-val">{{startDate || '选一个有意义的日期'}}</text>
+      </view>
+    </picker>
+    <text class="input-hint">比如妈妈的生日、第一次视频通话的日子…</text>
 
     <text class="error" wx:if="{{error}}">{{error}}</text>
 
@@ -50,8 +79,7 @@
   <view wx:elif="{{step === 'created'}}">
     <text class="logo">🎉</text>
     <text class="title">家庭建好了</text>
-    <text class="subtitle" wx:if="{{migrated}}">旧数据也帮你搬过来了 💕</text>
-    <text class="subtitle" wx:else>把邀请码发给妈妈</text>
+    <text class="subtitle">把邀请码发给妈妈</text>
 
     <view class="code-box">
       <text class="code-label">你的家庭邀请码</text>

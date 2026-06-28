@@ -37,6 +37,44 @@
   opacity: 0.5;
 }
 
+.name-edit-row {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+  width: 100%;
+}
+
+.name-edit-label {
+  font-size: 22rpx;
+  color: #9E8B7E;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+  white-space: nowrap;
+}
+
+.name-edit-input {
+  flex: 1;
+  background: #fff;
+  border-radius: 14rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  color: #2A1F10;
+  box-sizing: border-box;
+  margin-right: 16rpx;
+  box-shadow: 0 2rpx 10rpx rgba(42, 31, 16, 0.06);
+}
+
+.name-placeholder { color: #D8C8BE; }
+
+.name-save-btn {
+  background: #2D3926;
+  border-radius: 12rpx;
+  padding: 16rpx 28rpx;
+  font-size: 24rpx;
+  color: #F3E8D4;
+  flex-shrink: 0;
+}
+
 /* ── 邀请码 ── */
 .invite-box {
   background: #FFFCF7;
