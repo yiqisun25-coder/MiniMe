@@ -12,8 +12,9 @@
 // ============================================================
 module.exports = {
   SUBSCRIBE: {
-    templateId: '',
-    contentKey: 'thing1',
-    timeKey: 'time2',
+    // 「日程提醒」模板：提醒内容 + 时间
+    templateId: 'GVm_3RX1jdEu9HcyNsqmZhoRu6qMUfEpX20LDD5ZPBQ',
+    contentKey: 'thing2',
+    timeKey: 'time25',
   },
 };
