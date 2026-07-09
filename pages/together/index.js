@@ -248,7 +248,7 @@ Page({
         imageId = uploadRes.fileID;
       }
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       const entry = { id: `d${Date.now()}`, text, time: new Date().toISOString(), image: imageId };
       data.myDaily = [...(data.myDaily || []), entry];
       await writeData(data);
@@ -326,7 +326,7 @@ Page({
     const listKey = keyMap[itemType];
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       data[listKey] = (data[listKey] || []).map(r => {
         if (r.id !== id) return r;
         const reactions = [...(r.reactions || [])];
@@ -351,7 +351,7 @@ Page({
     const listKey = keyMap[type];
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       data[listKey] = (data[listKey] || []).map(r => {
         if (r.id !== id) return r;
         return { ...r, reactions: (r.reactions || []).filter((_, i) => i !== ri) };
@@ -387,7 +387,7 @@ Page({
     const listKey = keyMap[type];
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       data[listKey] = (data[listKey] || []).map(r => {
         if (r.id !== id) return r;
         return { ...r, reactions: (r.reactions || []).filter((_, i) => i !== ri) };
@@ -408,7 +408,7 @@ Page({
     const listKey = keyMap[itemType];
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       const entry = { ...reaction, time: new Date().toISOString() };
       data[listKey] = (data[listKey] || []).map(r =>
         r.id !== id ? r : { ...r, reactions: [...(r.reactions || []), entry] }

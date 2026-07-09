@@ -120,6 +120,11 @@ Page({
     }
   },
 
+  onUnload() {
+    clearTimeout(this._splashTimer1);
+    clearTimeout(this._splashTimer2);
+  },
+
   onShow() {
     if (getApp().globalData.needSetup) { wx.navigateTo({ url: '/pages/setup/index' }); return; }
     // setup 完成后播放开屏动画
@@ -182,7 +187,7 @@ Page({
     this.setData({ loading: true });
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       if (!app.globalData.binData) app.globalData.binData = data;
       let records = (data.momRecords || [])
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
@@ -240,7 +245,7 @@ Page({
     this.setData({ submitting: true });
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       const mood = this.data.selectedMood !== null
         ? MOODS[this.data.selectedMood].emoji + ' ' + MOODS[this.data.selectedMood].label
         : null;
@@ -326,7 +331,7 @@ Page({
     if (!text) return;
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       const mood = this.data.editingMood !== null
         ? MOODS[this.data.editingMood].emoji + ' ' + MOODS[this.data.editingMood].label
         : null;
@@ -371,7 +376,7 @@ Page({
         if (!res.confirm) return;
         try {
           const app = getApp();
-          const data = app.globalData.binData || await readData();
+          const data = await readData();
           data.momRecords = (data.momRecords || []).filter(r => r.id !== id);
           await writeData(data);
           app.globalData.binData = data;

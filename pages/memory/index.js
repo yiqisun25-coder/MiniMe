@@ -30,7 +30,7 @@ Page({
     this.setData({ submitting: true });
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
 
       // 上传照片（如果有）
       let image = '';

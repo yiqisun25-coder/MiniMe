@@ -41,12 +41,31 @@ async function callFamily(action, extra = {}) {
   return (res && res.result) || {};
 }
 
+// 本地存的家庭码已失效（家庭没了/绑定丢了）：清掉本地，带用户回 setup 重新来
+let _redirectingSetup = false;
+function handleNotBound() {
+  wx.removeStorageSync('familyCode');
+  wx.removeStorageSync('userRole');
+  const app = getApp();
+  app.globalData.binData = null;
+  app.globalData.needSetup = true;
+  if (_redirectingSetup) return;
+  const pages = getCurrentPages();
+  const current = pages[pages.length - 1];
+  if (current && current.route === 'pages/setup/index') return;
+  _redirectingSetup = true;
+  wx.navigateTo({
+    url: '/pages/setup/index',
+    complete: () => { _redirectingSetup = false; },
+  });
+}
+
 // 读写都走云函数：服务端只认 openid 绑定的家庭，数据库对客户端不开放
 async function readData() {
   const code = getFamilyCode();
   if (!code) throw new Error('no_family_code');
   const r = await callFamily('read', { code, role: getUserRole() || '' });
-  if (r.error === 'not_bound') throw new Error('no_family_code');
+  if (r.error === 'not_bound') { handleNotBound(); throw new Error('no_family_code'); }
   if (r.error) throw new Error(r.error);
   return r.data || { ...EMPTY_DATA };
 }
@@ -56,7 +75,7 @@ async function writeData(data) {
   if (!code) throw new Error('no_family_code');
   const { _id, _openid, ...payload } = data;
   const r = await callFamily('write', { code, role: getUserRole() || '', data: payload });
-  if (r.error === 'not_bound') throw new Error('no_family_code');
+  if (r.error === 'not_bound') { handleNotBound(); throw new Error('no_family_code'); }
   if (r.error) throw new Error(r.error);
   return data;
 }
@@ -102,16 +121,10 @@ async function joinFamily(inputCode) {
     err.role = r.role;
     throw err;
   }
+  if (r.error === 'family_full') throw new Error('family_full');
   if (r.error) throw new Error('invalid_code');
   setFamilyCode(r.code);
   return r.family || {};
-}
-
-// 老设备补绑定：已有家庭码但服务端还没记录（静默，失败无所谓，下次再试）
-function ensureBind() {
-  const code = getFamilyCode();
-  if (!code) return;
-  callFamily('ensureBind', { code, role: getUserRole() || '' }).catch(() => {});
 }
 
 // 解绑当前微信和家庭的关系（数据不删）
@@ -134,5 +147,5 @@ module.exports = {
   readData, writeData, createFamily, joinFamily,
   getFamilyCode, generateCode, isValidCode, makeCloudPath, EMPTY_DATA,
   getUserRole, setUserRole, getLastSeen, setLastSeen,
-  ensureBind, unbindFamily,
+  unbindFamily,
 };

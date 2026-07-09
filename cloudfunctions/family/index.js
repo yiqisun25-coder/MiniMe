@@ -118,6 +118,11 @@ exports.main = async (event) => {
       return { error: 'invalid_code' }
     }
     if (!res.data) return { error: 'invalid_code' }
+    // 一个家庭最多 4 人，码泄露了也进不来一群人
+    try {
+      const cnt = await db.collection('members').where({ code }).count()
+      if (cnt.total >= 4) return { error: 'family_full' }
+    } catch (e) {}
     await bind(OPENID, code, 'mom')
     const d = res.data
     return {

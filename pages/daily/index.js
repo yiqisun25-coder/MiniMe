@@ -43,7 +43,7 @@ Page({
     this.setData({ submitting: true });
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
 
       let image = '';
       if (this.data.photoPath) {

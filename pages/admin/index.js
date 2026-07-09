@@ -94,7 +94,7 @@ Page({
   async markAllRead() {
     const app = getApp();
     try {
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       data.momMessages = (data.momMessages || []).map(m => ({ ...m, readByYiqi: true }));
       await writeData(data);
       app.globalData.binData = data;
@@ -124,7 +124,7 @@ Page({
         if (!res.confirm) return;
         try {
           const app = getApp();
-          const data = app.globalData.binData || await readData();
+          const data = await readData();
           const keyMap = { daily: 'myDaily', memory: 'memories', letter: 'lettersToMom' };
           const listKey = keyMap[type];
           data[listKey] = (data[listKey] || []).filter(r => r.id !== id);
@@ -161,7 +161,7 @@ Page({
     if (!text) return;
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       const time = localToISO(this.data.editingDate, this.data.editingTime);
       data.myDaily = (data.myDaily || []).map(r =>
         r.id === this.data.editingId ? { ...r, text, time } : r
@@ -186,7 +186,7 @@ Page({
     const momName = this.data.momName.trim();
     try {
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       data.daughterName = daughterName;
       data.momName = momName;
       await writeData(data);
@@ -228,7 +228,7 @@ Page({
 
       // 存入家庭数据
       const app = getApp();
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       data.avatarFileId = fileID;
       await writeData(data);
       app.globalData.binData = data;

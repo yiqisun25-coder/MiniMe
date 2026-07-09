@@ -23,7 +23,7 @@ Page({
 
   async markAsRead(id, app) {
     try {
-      const data = app.globalData.binData || await readData();
+      const data = await readData();
       const idx = (data.lettersToMom || []).findIndex(l => l.id === id);
       if (idx >= 0 && !data.lettersToMom[idx].readByMom) {
         data.lettersToMom[idx].readByMom = true;

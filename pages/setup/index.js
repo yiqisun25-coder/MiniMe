@@ -113,6 +113,10 @@ Page({
         });
         return;
       }
+      if (e.message === 'family_full') {
+        this.setData({ step: 'joining', error: '这个家庭人数已满，加入不了了' });
+        return;
+      }
       this.setData({ step: 'joining', error: '没找到这个邀请码，确认一下是不是输错了' });
     }
   },
