@@ -1,3 +1,5 @@
+const { SUBSCRIBE } = require('./config');
+
 const EMPTY_DATA = {
   momMessages: [],
   lettersToMom: [],
@@ -132,6 +134,35 @@ async function unbindFamily() {
   await callFamily('unbind');
 }
 
+// ── 订阅消息 ──
+// 请求订阅（只能在用户点击的调用链里发起）：同意一次 = 将来能收到一条提醒
+// 用户勾选"总是保持以上选择"后不再弹窗，每次调用静默累积额度
+function askSubscribe() {
+  if (!SUBSCRIBE.templateId) return;
+  try {
+    wx.requestSubscribeMessage({
+      tmplIds: [SUBSCRIBE.templateId],
+      success: (res) => {
+        if (res[SUBSCRIBE.templateId] === 'accept') {
+          callFamily('grantSub').catch(() => {});
+        }
+      },
+      fail: () => {},
+    });
+  } catch (e) { /* 老基础库不支持就算了 */ }
+}
+
+// 内容发布成功后通知家里其他人（静默执行，失败不影响主流程）
+function notifyFamily(text) {
+  if (!SUBSCRIBE.templateId) return;
+  callFamily('notify', {
+    templateId: SUBSCRIBE.templateId,
+    contentKey: SUBSCRIBE.contentKey,
+    timeKey: SUBSCRIBE.timeKey,
+    text: String(text || ''),
+  }).catch(() => {});
+}
+
 // ── 图片临时链接缓存 ──
 // 临时链接约 2 小时有效，缓存 90 分钟：切 tab 不再重复调云函数，页面明显变快
 const _imgUrlCache = {}; // fileID -> { url, expire }
@@ -182,4 +213,5 @@ module.exports = {
   getFamilyCode, generateCode, isValidCode, makeCloudPath, EMPTY_DATA,
   getUserRole, setUserRole, getLastSeen, setLastSeen,
   unbindFamily, resolveImageURLs, clearImageURLCache,
+  askSubscribe, notifyFamily,
 };

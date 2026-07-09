@@ -1,4 +1,4 @@
-const { readData, writeData, getUserRole, getLastSeen, setLastSeen, makeCloudPath, resolveImageURLs } = require('../../utils/api');
+const { readData, writeData, getUserRole, getLastSeen, setLastSeen, makeCloudPath, resolveImageURLs, askSubscribe, notifyFamily } = require('../../utils/api');
 const { formatDate, localDateStr, localTimeStr, daysSince } = require('../../utils/time');
 
 async function resolveImages(items) {
@@ -74,6 +74,10 @@ Page({
 
   switchView(e) {
     this.setData({ viewMode: e.currentTarget.dataset.mode });
+  },
+
+  async onPullDownRefresh() {
+    try { await this.load(); } finally { wx.stopPullDownRefresh(); }
   },
 
   async load() {
@@ -230,6 +234,7 @@ Page({
   async submitCompose() {
     const text = this.data.composeText.trim();
     if (!text || this.data.composeSending) return;
+    askSubscribe(); // 借这次点击攒一条"将来收到提醒"的额度
     this.setData({ composeSending: true });
     try {
       let imageId = '';
@@ -247,6 +252,7 @@ Page({
       data.myDaily = [...(data.myDaily || []), entry];
       await writeData(data);
       app.globalData.binData = null;
+      notifyFamily(`女儿：${text}`);
       this.closeCompose();
       await this.load();
       wx.showToast({ title: '发出去啦 💕', icon: 'none' });

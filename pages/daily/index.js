@@ -1,4 +1,4 @@
-const { readData, writeData, makeCloudPath } = require('../../utils/api');
+const { readData, writeData, makeCloudPath, askSubscribe, notifyFamily } = require('../../utils/api');
 const { localDateStr, localTimeStr, localToISO } = require('../../utils/time');
 
 function todayStr() { return localDateStr(); }
@@ -40,6 +40,7 @@ Page({
   async onSubmit() {
     const text = this.data.text.trim();
     if (!text || this.data.submitting) return;
+    askSubscribe(); // 借这次点击攒一条"将来收到提醒"的额度
     this.setData({ submitting: true });
     try {
       const app = getApp();
@@ -63,6 +64,7 @@ Page({
       ];
       await writeData(data);
       app.globalData.binData = data;
+      notifyFamily(`女儿：${text}`);
       this.setData({ submitted: true, submitting: false });
     } catch (e) {
       this.setData({ submitting: false });

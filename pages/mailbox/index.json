@@ -1,1 +1,5 @@
-{ "navigationBarTitleText": "信箱 📮" }
+{
+  "navigationBarTitleText": "信箱 📮",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

@@ -126,6 +126,10 @@ Page({
     } catch (e) { /* 静默 */ }
   },
 
+  async onPullDownRefresh() {
+    try { await this._loadData(); } finally { wx.stopPullDownRefresh(); }
+  },
+
   goToMailbox() {
     wx.navigateTo({ url: '/pages/mailbox/index' });
   },

@@ -34,6 +34,10 @@ Page({
     }
   },
 
+  async onPullDownRefresh() {
+    try { await this.load(); } finally { wx.stopPullDownRefresh(); }
+  },
+
   onLetterTap(e) {
     const id = e.currentTarget.dataset.id;
     const app = getApp();

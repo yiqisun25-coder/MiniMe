@@ -1,4 +1,4 @@
-const { readData, writeData, getUserRole, setLastSeen, makeCloudPath, resolveImageURLs } = require('../../utils/api');
+const { readData, writeData, getUserRole, setLastSeen, makeCloudPath, resolveImageURLs, askSubscribe, notifyFamily } = require('../../utils/api');
 const { formatDateTime, localDateStr, localTimeStr, localToISO, daysSince, heroDateStr } = require('../../utils/time');
 
 function getTodayStr() { return localDateStr(); }
@@ -125,6 +125,10 @@ Page({
     clearTimeout(this._splashTimer2);
   },
 
+  async onPullDownRefresh() {
+    try { await this.load(); } finally { wx.stopPullDownRefresh(); }
+  },
+
   onShow() {
     if (getApp().globalData.needSetup) { wx.navigateTo({ url: '/pages/setup/index' }); return; }
     // setup 完成后播放开屏动画
@@ -236,6 +240,7 @@ Page({
   async onSubmit() {
     const text = this.data.inputText.trim();
     if (!text || this.data.submitting) return;
+    askSubscribe(); // 借这次点击攒一条"将来收到提醒"的额度
     this.setData({ submitting: true });
     try {
       const app = getApp();
@@ -263,6 +268,7 @@ Page({
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
       records = await this._resolveImages(records);
+      notifyFamily(`妈妈：${text}`);
       const response = WARM_RESPONSES[Math.floor(Math.random() * WARM_RESPONSES.length)];
       this.setData({
         submitting: false, showForm: false,

@@ -2,6 +2,7 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
+const _ = db.command
 
 const EMPTY_DATA = {
   momMessages: [],
@@ -142,6 +143,58 @@ exports.main = async (event) => {
     if (!code || !(await familyExists(code))) return { error: 'invalid_code' }
     await bind(OPENID, code, event.role || '')
     return { code }
+  }
+
+  // 用户同意了一次订阅：记一条可发送额度（一次性订阅，同意一次发一条）
+  if (action === 'grantSub') {
+    const bound = await getBinding(OPENID)
+    if (!bound) return { error: 'not_bound' }
+    try {
+      await db.collection('members').doc(OPENID).update({
+        data: { subCount: _.inc(1) },
+      })
+    } catch (e) {}
+    return { ok: true }
+  }
+
+  // 发布新内容后通知家里其他成员（每人消耗一条订阅额度）
+  if (action === 'notify') {
+    const bound = await getBinding(OPENID)
+    if (!bound) return { error: 'not_bound' }
+    const { templateId, contentKey, timeKey, text } = event
+    if (!templateId) return { ok: true, sent: 0 }
+    let others = []
+    try {
+      const res = await db.collection('members')
+        .where({ code: bound.code, subCount: _.gt(0) })
+        .get()
+      others = (res.data || []).filter((m) => m._id !== OPENID)
+    } catch (e) {}
+    // 服务器是 UTC，转成北京时间显示
+    const now = new Date(Date.now() + 8 * 3600 * 1000)
+    const timeStr = `${now.getUTCFullYear()}年${now.getUTCMonth() + 1}月${now.getUTCDate()}日`
+    let sent = 0
+    for (const m of others) {
+      const data = {}
+      if (contentKey) data[contentKey] = { value: String(text || '有新内容啦').slice(0, 20) }
+      if (timeKey) data[timeKey] = { value: timeStr }
+      try {
+        await cloud.openapi.subscribeMessage.send({
+          touser: m._id,
+          templateId,
+          page: 'pages/together/index',
+          data,
+        })
+        sent++
+        await db.collection('members').doc(m._id).update({ data: { subCount: _.inc(-1) } })
+      } catch (e) {
+        // 发送失败（拒收/额度失效）：额度清零，避免每次都白试
+        try {
+          await db.collection('members').doc(m._id).update({ data: { subCount: 0 } })
+        } catch (_e) {}
+      }
+    }
+    return { ok: true, sent }
   }
 
   // 解绑（误加入了别人的家庭时的出口）

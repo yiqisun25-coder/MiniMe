@@ -1,4 +1,4 @@
-const { readData, writeData } = require('../../utils/api');
+const { readData, writeData, askSubscribe, notifyFamily } = require('../../utils/api');
 
 Page({
   onShow() {
@@ -21,6 +21,7 @@ Page({
     const text = this.data.inputText.trim();
     if (!text || this.data.submitting) return;
 
+    askSubscribe(); // 借这次点击攒一条"将来收到提醒"的额度
     this.setData({ submitting: true });
     try {
       const app = getApp();
@@ -31,6 +32,7 @@ Page({
       ];
       await writeData(data);
       app.globalData.binData = data;
+      notifyFamily(`妈妈留言：${text}`);
       this.setData({ submitted: true, submitting: false });
     } catch (e) {
       this.setData({ submitting: false });

@@ -1,9 +1,19 @@
 // ============================================================
-// JSONBin 配置 — 填完这两个值，整个 v1 功能就通了
-// BIN_ID: 在 jsonbin.io 新建一个 Bin，把 ID 填进来
-// MASTER_KEY: 你 JSONBin 账号的 Master Key
+// 订阅消息（微信通知）配置
+//
+// 开通步骤：
+// 1. 打开 mp.weixin.qq.com → 左侧「订阅消息」→「公共模板库」
+//    挑一个通用提醒类模板（最好带两个字段：一个"内容"、一个"时间"）
+// 2. 选用后在「我的模板」里能看到 模板ID，填到下面 templateId
+// 3. 点开模板详情，把两个字段的"字段名"（形如 thing1、time2）
+//    分别填到 contentKey / timeKey
+//
+// templateId 留空 = 通知功能关闭，app 其他功能完全不受影响
 // ============================================================
 module.exports = {
-  BIN_ID: '<removed>',
-  MASTER_KEY: '<removed-rotated-key>',
+  SUBSCRIBE: {
+    templateId: '',
+    contentKey: 'thing1',
+    timeKey: 'time2',
+  },
 };
