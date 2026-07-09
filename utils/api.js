@@ -132,6 +132,40 @@ async function unbindFamily() {
   await callFamily('unbind');
 }
 
+// ── 图片临时链接缓存 ──
+// 临时链接约 2 小时有效，缓存 90 分钟：切 tab 不再重复调云函数，页面明显变快
+const _imgUrlCache = {}; // fileID -> { url, expire }
+
+function clearImageURLCache(fileID) {
+  if (fileID) delete _imgUrlCache[fileID];
+  else Object.keys(_imgUrlCache).forEach((k) => delete _imgUrlCache[k]);
+}
+
+// 批量换链接：命中缓存的直接用，没命中的才去调 getImageURLs
+// 返回 { fileID: url }，拿不到的没有 key，调用方按空处理
+async function resolveImageURLs(fileIDs) {
+  const now = Date.now();
+  const map = {};
+  const need = [];
+  (fileIDs || []).forEach((id) => {
+    const hit = _imgUrlCache[id];
+    if (hit && hit.expire > now) map[id] = hit.url;
+    else if (need.indexOf(id) < 0) need.push(id);
+  });
+  if (need.length) {
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getImageURLs', data: { fileList: need } });
+      (((res || {}).result || {}).fileList || []).forEach((f) => {
+        if (f.tempFileURL) {
+          map[f.fileID] = f.tempFileURL;
+          _imgUrlCache[f.fileID] = { url: f.tempFileURL, expire: now + 90 * 60 * 1000 };
+        }
+      });
+    } catch (e) { /* 换不到就当没有，图片显示为空，不阻塞页面 */ }
+  }
+  return map;
+}
+
 // 上传路径按家庭码隔离，加随机后缀避免同毫秒覆盖
 function makeCloudPath(folder, ext) {
   const code = getFamilyCode() || 'unknown';
@@ -147,5 +181,5 @@ module.exports = {
   readData, writeData, createFamily, joinFamily,
   getFamilyCode, generateCode, isValidCode, makeCloudPath, EMPTY_DATA,
   getUserRole, setUserRole, getLastSeen, setLastSeen,
-  unbindFamily,
+  unbindFamily, resolveImageURLs, clearImageURLCache,
 };

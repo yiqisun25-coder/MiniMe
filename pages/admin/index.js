@@ -1,4 +1,4 @@
-const { readData, writeData, getFamilyCode, unbindFamily } = require('../../utils/api');
+const { readData, writeData, getFamilyCode, unbindFamily, resolveImageURLs, clearImageURLCache } = require('../../utils/api');
 const { formatDateTime, localDateStr, localTimeStr, localToISO } = require('../../utils/time');
 
 const DEFAULT_AVATAR = '/images/default_avatar.jpg';
@@ -58,14 +58,8 @@ Page({
       let avatarSrc = DEFAULT_AVATAR;
       const avatarFileId = data.avatarFileId || '';
       if (avatarFileId) {
-        try {
-          const res = await wx.cloud.callFunction({
-            name: 'getImageURLs',
-            data: { fileList: [avatarFileId] },
-          });
-          const item = res.result && res.result.fileList && res.result.fileList[0];
-          if (item && item.tempFileURL) avatarSrc = item.tempFileURL;
-        } catch (_) {}
+        const map = await resolveImageURLs([avatarFileId]);
+        if (map[avatarFileId]) avatarSrc = map[avatarFileId];
       }
 
       const daughterName = data.daughterName || '';
@@ -218,13 +212,10 @@ Page({
       const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempFilePath });
       const fileID = uploadRes.fileID;
 
-      // 转成可展示的 URL
-      const urlRes = await wx.cloud.callFunction({
-        name: 'getImageURLs',
-        data: { fileList: [fileID] },
-      });
-      const item = urlRes.result && urlRes.result.fileList && urlRes.result.fileList[0];
-      const avatarSrc = (item && item.tempFileURL) ? item.tempFileURL : tempFilePath;
+      // 头像是同路径覆盖上传（fileID 不变），先清掉旧链接缓存再换新的
+      clearImageURLCache(fileID);
+      const map = await resolveImageURLs([fileID]);
+      const avatarSrc = map[fileID] || tempFilePath;
 
       // 存入家庭数据
       const app = getApp();

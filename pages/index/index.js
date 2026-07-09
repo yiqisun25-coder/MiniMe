@@ -1,4 +1,4 @@
-const { readData, getUserRole, getLastSeen } = require('../../utils/api');
+const { readData, getUserRole, getLastSeen, resolveImageURLs } = require('../../utils/api');
 
 const DEFAULT_AVATAR = '/images/default_avatar.jpg';
 
@@ -105,14 +105,8 @@ Page({
       // 加载头像：有上传 → 用上传的；没有 → 用 PHOTOS（不动原有场景照片）
       let uploadedAvatar = '';
       if (data.avatarFileId) {
-        try {
-          const res = await wx.cloud.callFunction({
-            name: 'getImageURLs',
-            data: { fileList: [data.avatarFileId] },
-          });
-          const item = res.result && res.result.fileList && res.result.fileList[0];
-          if (item && item.tempFileURL) uploadedAvatar = item.tempFileURL;
-        } catch (_) {}
+        const map = await resolveImageURLs([data.avatarFileId]);
+        uploadedAvatar = map[data.avatarFileId] || '';
       }
 
       const letters = data.lettersToMom || [];

@@ -1,4 +1,4 @@
-const { readData, writeData, getUserRole, setLastSeen, makeCloudPath } = require('../../utils/api');
+const { readData, writeData, getUserRole, setLastSeen, makeCloudPath, resolveImageURLs } = require('../../utils/api');
 const { formatDateTime, localDateStr, localTimeStr, localToISO, daysSince, heroDateStr } = require('../../utils/time');
 
 function getTodayStr() { return localDateStr(); }
@@ -170,17 +170,11 @@ Page({
   async _resolveImages(records) {
     const ids = records.filter(r => r.image && r.image.startsWith('cloud://')).map(r => r.image);
     if (!ids.length) return records;
-    try {
-      const res = await wx.cloud.callFunction({ name: 'getImageURLs', data: { fileList: ids } });
-      const map = {};
-      (res.result.fileList || []).forEach(f => { if (f.tempFileURL) map[f.fileID] = f.tempFileURL; });
-      return records.map(r => ({
-        ...r,
-        image: r.image && r.image.startsWith('cloud://') ? (map[r.image] || '') : r.image,
-      }));
-    } catch (e) {
-      return records.map(r => ({ ...r, image: r.image && r.image.startsWith('cloud://') ? '' : r.image }));
-    }
+    const map = await resolveImageURLs(ids);
+    return records.map(r => ({
+      ...r,
+      image: r.image && r.image.startsWith('cloud://') ? (map[r.image] || '') : r.image,
+    }));
   },
 
   async load() {

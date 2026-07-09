@@ -1,20 +1,14 @@
-const { readData, writeData, getUserRole, getLastSeen, setLastSeen, makeCloudPath } = require('../../utils/api');
+const { readData, writeData, getUserRole, getLastSeen, setLastSeen, makeCloudPath, resolveImageURLs } = require('../../utils/api');
 const { formatDate, localDateStr, localTimeStr, daysSince } = require('../../utils/time');
 
 async function resolveImages(items) {
   const ids = items.filter(r => r.image && r.image.startsWith('cloud://')).map(r => r.image);
   if (!ids.length) return items;
-  try {
-    const res = await wx.cloud.callFunction({ name: 'getImageURLs', data: { fileList: ids } });
-    const map = {};
-    (res.result.fileList || []).forEach(f => { if (f.tempFileURL) map[f.fileID] = f.tempFileURL; });
-    return items.map(r => ({
-      ...r,
-      image: r.image && r.image.startsWith('cloud://') ? (map[r.image] || '') : r.image,
-    }));
-  } catch (e) {
-    return items.map(r => ({ ...r, image: r.image && r.image.startsWith('cloud://') ? '' : r.image }));
-  }
+  const map = await resolveImageURLs(ids);
+  return items.map(r => ({
+    ...r,
+    image: r.image && r.image.startsWith('cloud://') ? (map[r.image] || '') : r.image,
+  }));
 }
 
 const TILTS = [-3, -1.5, 0, 1.5, 3, -2, 2, -1, 1, -2.5];
