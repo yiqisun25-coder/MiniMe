@@ -1,11 +1,8 @@
-const { readData, writeData, getUserRole, setLastSeen } = require('../../utils/api');
-const { formatDateTime } = require('../../utils/time');
+const { readData, writeData, getUserRole, setLastSeen, makeCloudPath } = require('../../utils/api');
+const { formatDateTime, localDateStr, localTimeStr, localToISO, daysSince, heroDateStr } = require('../../utils/time');
 
-function getTodayStr() { return new Date().toISOString().slice(0, 10); }
-function getNowTimeStr() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
+function getTodayStr() { return localDateStr(); }
+function getNowTimeStr() { return localTimeStr(); }
 
 const WELLNESS_SIGNS = [
   { icon: '🍵', wisdom: '饭后喝一小杯普洱，暖胃助消化', care: '记得饭后半小时再喝，慢慢品 💕' },
@@ -75,6 +72,7 @@ function getGreeting() {
 Page({
   data: {
     greeting: '',
+    headerDate: '',
     records: [],
     loading: true,
     showForm: false,
@@ -107,7 +105,7 @@ Page({
 
   onLoad() {
     const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
-    const days = Math.floor((Date.now() - new Date(savedStart).getTime()) / 86400000) + 1;
+    const days = daysSince(savedStart);
     this.setData({ today: getTodayStr(), selectedDate: getTodayStr(), selectedTime: getNowTimeStr(), daysTogether: days.toLocaleString('zh-CN') });
     const app = getApp();
     if (!app.globalData.splashShown) {
@@ -130,7 +128,7 @@ Page({
       app.globalData.showSplashOnNext = false;
       app.globalData.splashShown = true;
       const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
-      const days = Math.floor((Date.now() - new Date(savedStart).getTime()) / 86400000) + 1;
+      const days = daysSince(savedStart);
       this.setData({ showSplash: true, splashFading: false, daysTogether: days.toLocaleString('zh-CN') });
       if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: true });
       this._splashTimer1 = setTimeout(() => this.setData({ splashFading: true }), 3000);
@@ -149,7 +147,7 @@ Page({
         this.getTabBar().setData({ badges });
       }
     }
-    this.setData({ greeting: getGreeting(), userRole: getUserRole() || '' });
+    this.setData({ greeting: getGreeting(), headerDate: `${heroDateStr()} · 晴`, userRole: getUserRole() || '' });
     this._initWellness();
     getApp().globalData.binData = null;
     this.load();
@@ -190,6 +188,12 @@ Page({
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
       records = await this._resolveImages(records);
+
+      // 同步云端的起始日期到本地（妈妈的设备靠这里拿到女儿设置的日期）
+      if (data.startDate && data.startDate !== wx.getStorageSync('startDate')) {
+        wx.setStorageSync('startDate', data.startDate);
+        this.setData({ daysTogether: daysSince(data.startDate).toLocaleString('zh-CN') });
+      }
 
       // 用真实名字替换养生签里的占位名
       const name = data.daughterName || wx.getStorageSync('daughterName') || '祎琦';
@@ -244,12 +248,12 @@ Page({
       if (this.data.photoPath) {
         const ext = this.data.photoPath.split('.').pop() || 'jpg';
         const uploadRes = await wx.cloud.uploadFile({
-          cloudPath: `mom/${Date.now()}.${ext}`,
+          cloudPath: makeCloudPath('mom', ext),
           filePath: this.data.photoPath,
         });
         image = uploadRes.fileID;
       }
-      const time = new Date(`${this.data.selectedDate}T${this.data.selectedTime}:00`).toISOString();
+      const time = localToISO(this.data.selectedDate, this.data.selectedTime);
       data.momRecords = [
         { id: String(Date.now()), text, mood, image, time },
         ...(data.momRecords || []),
@@ -331,7 +335,7 @@ Page({
       if (this.data.editingPhotoPath) {
         const ext = this.data.editingPhotoPath.split('.').pop() || 'jpg';
         const uploadRes = await wx.cloud.uploadFile({
-          cloudPath: `mom/${Date.now()}.${ext}`,
+          cloudPath: makeCloudPath('mom', ext),
           filePath: this.data.editingPhotoPath,
         });
         image = uploadRes.fileID;

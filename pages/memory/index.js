@@ -1,4 +1,4 @@
-const { readData, writeData } = require('../../utils/api');
+const { readData, writeData, makeCloudPath } = require('../../utils/api');
 
 Page({
   data: {
@@ -37,7 +37,7 @@ Page({
       if (this.data.photoPath) {
         const ext = this.data.photoPath.split('.').pop() || 'jpg';
         const uploadRes = await wx.cloud.uploadFile({
-          cloudPath: `memories/${Date.now()}.${ext}`,
+          cloudPath: makeCloudPath('memories', ext),
           filePath: this.data.photoPath,
         });
         image = uploadRes.fileID;

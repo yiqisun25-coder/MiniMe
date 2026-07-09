@@ -26,6 +26,7 @@
     <text class="invite-label">家庭邀请码</text>
     <text class="invite-code">{{familyCode}}</text>
     <text class="invite-hint">把这个码发给妈妈，她输入后就连上了</text>
+    <text class="invite-unbind" bindtap="onUnbindTap">解绑退出这个家庭</text>
   </view>
 
   <!-- 妈妈的留言 -->

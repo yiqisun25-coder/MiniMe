@@ -9,10 +9,6 @@ const EMPTY_DATA = {
   momName: '',
 };
 
-function getDB() {
-  return wx.cloud.database({ env: 'cloud1-d5gbhjps14993bb27' });
-}
-
 function getFamilyCode() {
   return wx.getStorageSync('familyCode') || null;
 }
@@ -21,82 +17,112 @@ function setFamilyCode(code) {
   wx.setStorageSync('familyCode', code);
 }
 
-function generateCode() {
-  // 去掉易混淆字符 O/0/I/1
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+// 邀请码规则：6位，恰好3个字母 + 3个数字（顺序不限）
+function isValidCode(code) {
+  if (!/^[A-Z0-9]{6}$/.test(code)) return false;
+  return (code.match(/[A-Z]/g) || []).length === 3;
 }
 
+function generateCode() {
+  // 去掉易混淆字符 O/I 和 0/1
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const digits = '23456789';
+  const pick = (pool) => pool[Math.floor(Math.random() * pool.length)];
+  const chars = [pick(letters), pick(letters), pick(letters), pick(digits), pick(digits), pick(digits)];
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
+async function callFamily(action, extra = {}) {
+  const res = await wx.cloud.callFunction({ name: 'family', data: { action, ...extra } });
+  return (res && res.result) || {};
+}
+
+// 读写都走云函数：服务端只认 openid 绑定的家庭，数据库对客户端不开放
 async function readData() {
   const code = getFamilyCode();
   if (!code) throw new Error('no_family_code');
-  const db = getDB();
-  try {
-    const res = await db.collection('minime').doc(code).get();
-    return res.data || { ...EMPTY_DATA };
-  } catch (e) {
-    const msg = e.message || e.errMsg || '';
-    if (msg.includes('cannot find document')) {
-      try {
-        await db.collection('minime').add({ data: { _id: code, ...EMPTY_DATA } });
-      } catch (_) {}
-    } else {
-      console.error('readData error:', e);
-    }
-    return { ...EMPTY_DATA };
-  }
+  const r = await callFamily('read', { code, role: getUserRole() || '' });
+  if (r.error === 'not_bound') throw new Error('no_family_code');
+  if (r.error) throw new Error(r.error);
+  return r.data || { ...EMPTY_DATA };
 }
 
 async function writeData(data) {
   const code = getFamilyCode();
   if (!code) throw new Error('no_family_code');
-  const db = getDB();
   const { _id, _openid, ...payload } = data;
-  await db.collection('minime').doc(code).set({ data: payload });
+  const r = await callFamily('write', { code, role: getUserRole() || '', data: payload });
+  if (r.error === 'not_bound') throw new Error('no_family_code');
+  if (r.error) throw new Error(r.error);
   return data;
 }
 
-// 女儿创建家庭：支持自定义码或自动生成
+// 女儿创建家庭：走云函数，服务端校验"每人只能有一个家庭"和邀请码格式
 async function createFamily(customCode, extraData = {}) {
-  const db = getDB();
-  const code = customCode ? customCode.toUpperCase() : generateCode();
-
-  try {
-    await db.collection('minime').add({
-      data: { _id: code, ...EMPTY_DATA, ...extraData },
-    });
-  } catch (e) {
-    const msg = e.message || e.errMsg || '';
-    if (msg.includes('duplicate') || msg.includes('existed') || msg.includes('unique')) {
-      throw new Error('code_taken');
+  let code = customCode ? customCode.toUpperCase() : generateCode();
+  for (let attempt = 0; ; attempt++) {
+    const r = await callFamily('create', { code, extraData });
+    if (!r.error) {
+      setFamilyCode(r.code);
+      return { code: r.code, migrated: false };
     }
-    if (!customCode) {
-      const retry = generateCode();
-      await db.collection('minime').add({
-        data: { _id: retry, ...EMPTY_DATA, ...extraData },
-      });
-      setFamilyCode(retry);
-      return { code: retry, migrated: false };
+    if (r.error === 'already_bound') {
+      // 这个微信已经有家庭了，直接恢复
+      setFamilyCode(r.code);
+      const err = new Error('already_bound');
+      err.code = r.code;
+      err.role = r.role;
+      throw err;
     }
-    throw e;
+    // 自动生成的码撞车了就换一个重试
+    if (r.error === 'code_taken' && !customCode && attempt < 2) {
+      code = generateCode();
+      continue;
+    }
+    throw new Error(r.error);
   }
-
-  setFamilyCode(code);
-  return { code, migrated: false };
 }
 
-// 妈妈加入：输入邀请码连接
+// 妈妈加入：走云函数，服务端校验"每人只能加入一个家庭"
 async function joinFamily(inputCode) {
   const code = inputCode.trim().toUpperCase();
-  const db = getDB();
-  const res = await db.collection('minime').doc(code).get();
-  if (!res.data) throw new Error('invalid_code');
-  setFamilyCode(code);
-  return res.data;
+  const r = await callFamily('join', { code });
+  if (r.error === 'already_bound') {
+    if (r.code === code) {
+      // 重复加入自己的家庭（比如换手机），直接恢复
+      setFamilyCode(r.code);
+      return {};
+    }
+    const err = new Error('already_bound');
+    err.code = r.code;
+    err.role = r.role;
+    throw err;
+  }
+  if (r.error) throw new Error('invalid_code');
+  setFamilyCode(r.code);
+  return r.family || {};
+}
+
+// 老设备补绑定：已有家庭码但服务端还没记录（静默，失败无所谓，下次再试）
+function ensureBind() {
+  const code = getFamilyCode();
+  if (!code) return;
+  callFamily('ensureBind', { code, role: getUserRole() || '' }).catch(() => {});
+}
+
+// 解绑当前微信和家庭的关系（数据不删）
+async function unbindFamily() {
+  await callFamily('unbind');
+}
+
+// 上传路径按家庭码隔离，加随机后缀避免同毫秒覆盖
+function makeCloudPath(folder, ext) {
+  const code = getFamilyCode() || 'unknown';
+  return `${code}/${folder}/${Date.now()}-${Math.floor(Math.random() * 1000000)}.${ext || 'jpg'}`;
 }
 
 function getUserRole() { return wx.getStorageSync('userRole') || null; }
@@ -106,6 +132,7 @@ function setLastSeen(key) { wx.setStorageSync(key, new Date().toISOString()); }
 
 module.exports = {
   readData, writeData, createFamily, joinFamily,
-  getFamilyCode, generateCode, EMPTY_DATA,
+  getFamilyCode, generateCode, isValidCode, makeCloudPath, EMPTY_DATA,
   getUserRole, setUserRole, getLastSeen, setLastSeen,
+  ensureBind, unbindFamily,
 };

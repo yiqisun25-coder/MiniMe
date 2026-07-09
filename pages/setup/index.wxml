@@ -29,14 +29,14 @@
 
     <input
       class="code-input"
-      placeholder="留空自动生成，或比如 MAMA66"
+      placeholder="留空自动生成，或比如 MOM520"
       placeholder-class="code-placeholder"
       value="{{customCode}}"
       bindinput="onCustomCodeInput"
-      maxlength="8"
+      maxlength="6"
       focus="{{true}}"
     />
-    <text class="input-hint">4-8位，字母或数字，不区分大小写</text>
+    <text class="input-hint">6位：3个字母 + 3个数字，不区分大小写</text>
 
     <text class="name-label">妈妈叫我</text>
     <input
@@ -84,7 +84,7 @@
     <view class="code-box">
       <text class="code-label">你的家庭邀请码</text>
       <text class="code-text">{{familyCode}}</text>
-      <text class="code-hint">妈妈打开小程序后输入这6个字母就连上了</text>
+      <text class="code-hint">妈妈打开小程序后输入这个邀请码就连上了</text>
     </view>
 
     <view class="btn-primary" bindtap="onEnterApp">
@@ -96,7 +96,7 @@
   <view wx:elif="{{step === 'joining' || step === 'joining_loading'}}">
     <text class="logo">💌</text>
     <text class="title">输入邀请码</text>
-    <text class="subtitle">女儿发给你的那6个字母</text>
+    <text class="subtitle">女儿发给你的那个邀请码</text>
 
     <input
       class="code-input"

@@ -1,4 +1,5 @@
-const { createFamily, joinFamily, generateCode, setUserRole } = require('../../utils/api');
+const { createFamily, joinFamily, isValidCode, setUserRole } = require('../../utils/api');
+const { localDateStr } = require('../../utils/time');
 
 
 Page({
@@ -11,7 +12,7 @@ Page({
     daughterName: '',   // 妈妈叫我
     momName: '',        // 我叫妈妈
     startDate: '',      // 在一起起始日期
-    today: new Date().toISOString().slice(0, 10),
+    today: localDateStr(),
     inputCode: '',      // 妈妈输入的码
     error: '',
   },
@@ -39,12 +40,10 @@ Page({
 
   async onConfirmCreate() {
     const code = this.data.customCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (code && code.length < 4) {
-      this.setData({ error: '至少4位，再想一个' });
+    if (code && !isValidCode(code)) {
+      this.setData({ error: '要3个字母加3个数字（6位），比如 MOM520' });
       return;
     }
-    // 空 → 自动生成一个
-    const finalInput = code || generateCode();
     this.setData({ step: 'creating', error: '' });
     try {
       const name = this.data.daughterName.trim();
@@ -54,16 +53,29 @@ Page({
       if (name) extra.daughterName = name;
       if (mom)  extra.momName = mom;
       if (start) extra.startDate = start;
-      const { code: finalCode, migrated } = await createFamily(finalInput, extra);
+      // 空 → api 里自动生成并在撞车时重试
+      const { code: finalCode, migrated } = await createFamily(code || null, extra);
       if (name) wx.setStorageSync('daughterName', name);
       if (mom)  wx.setStorageSync('momName', mom);
       if (start) wx.setStorageSync('startDate', start);
       this.setData({ step: 'created', familyCode: finalCode, migrated });
     } catch (e) {
-      const taken = e.message === 'code_taken';
+      if (e.message === 'already_bound') {
+        // 这个微信已经有家庭了，直接恢复进入
+        setUserRole(e.role || 'daughter');
+        getApp().globalData.needSetup = false;
+        getApp().globalData.showSplashOnNext = true;
+        wx.showToast({ title: `你已经有家庭啦（${e.code}），带你进去`, icon: 'none' });
+        setTimeout(() => wx.navigateBack(), 1200);
+        return;
+      }
+      const msgMap = {
+        code_taken: '这个码被别人用了，换一个试试 😄',
+        bad_format: '要3个字母加3个数字（6位），比如 MOM520',
+      };
       this.setData({
         step: 'set_code',
-        error: taken ? '这个码被别人用了，换一个试试 😄' : '创建失败，检查一下网络～',
+        error: msgMap[e.message] || '创建失败，检查一下网络～',
       });
     }
   },
@@ -84,12 +96,23 @@ Page({
     }
     this.setData({ step: 'joining_loading', error: '' });
     try {
-      await joinFamily(code);
+      const family = await joinFamily(code);
+      // 把女儿创建家庭时设置的信息同步到妈妈的设备（开屏天数依赖 startDate）
+      if (family.startDate) wx.setStorageSync('startDate', family.startDate);
+      if (family.daughterName) wx.setStorageSync('daughterName', family.daughterName);
+      if (family.momName) wx.setStorageSync('momName', family.momName);
       setUserRole('mom');
       getApp().globalData.needSetup = false;
       getApp().globalData.showSplashOnNext = true;
       wx.navigateBack();
     } catch (e) {
+      if (e.message === 'already_bound') {
+        this.setData({
+          step: 'joining',
+          error: `这个微信已经绑定过家庭（${e.code}），一个人只能加入一个家庭。如果绑错了，在管理页可以解绑`,
+        });
+        return;
+      }
       this.setData({ step: 'joining', error: '没找到这个邀请码，确认一下是不是输错了' });
     }
   },

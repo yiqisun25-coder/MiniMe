@@ -90,6 +90,13 @@
 .invite-label { font-size: 22rpx; color: #9E8B7E; letter-spacing: 2rpx; }
 .invite-code  { font-size: 56rpx; font-weight: 700; color: #2A1F10; letter-spacing: 10rpx; }
 .invite-hint  { font-size: 22rpx; color: #C8B8AF; text-align: center; }
+.invite-unbind {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: #C4706A;
+  text-decoration: underline;
+  padding: 8rpx 16rpx;
+}
 
 /* ── 妈妈留言 ── */
 .toolbar {

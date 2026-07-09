@@ -1,7 +1,7 @@
 <view class="page-container">
   <!-- 顶部日期 -->
   <view class="top-meta">
-    <text class="top-date">SAT · {{today}}</text>
+    <text class="top-date">{{heroDate}}</text>
     <text class="page-title">陪陪我</text>
   </view>
 

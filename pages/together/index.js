@@ -1,5 +1,5 @@
-const { readData, writeData, getUserRole, getLastSeen, setLastSeen } = require('../../utils/api');
-const { formatDate } = require('../../utils/time');
+const { readData, writeData, getUserRole, getLastSeen, setLastSeen, makeCloudPath } = require('../../utils/api');
+const { formatDate, localDateStr, localTimeStr, daysSince } = require('../../utils/time');
 
 async function resolveImages(items) {
   const ids = items.filter(r => r.image && r.image.startsWith('cloud://')).map(r => r.image);
@@ -87,7 +87,7 @@ Page({
     try {
       const data = await readData();
 
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateStr();
 
       const momItems = (data.momRecords || []).map(r => ({
         ...r, type: 'mom', timeStr: formatDate(r.time),
@@ -111,11 +111,12 @@ Page({
 
       // 添加短时间和日期标签
       const todayStr = today;
-      const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const yesterdayStr = localDateStr(new Date(Date.now() - 86400000));
       let lastDate = '';
       items = items.map(item => {
-        const dateStr = (item.time || '').slice(0, 10);
-        const timeOnly = (item.time || '').slice(11, 16);
+        const t = item.time ? new Date(item.time) : null;
+        const dateStr = t ? localDateStr(t) : '';
+        const timeOnly = t ? localTimeStr(t) : '';
         let showDateLabel = false;
         let dateLabel = '';
         if (dateStr && dateStr !== lastDate) {
@@ -166,11 +167,10 @@ Page({
         this.getTabBar().setData({ badges });
       }
 
-      // 天数：优先读用户设置的起始日期
-      const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
-      const daysTogether = Math.floor((Date.now() - new Date(savedStart).getTime()) / 86400000) + 1;
-      // 格式化加千位分隔符
-      const daysStr = daysTogether.toLocaleString('zh-CN');
+      // 天数：优先用云端家庭数据里的起始日期，并同步到本地（妈妈的设备靠这里拿到女儿设置的日期）
+      const savedStart = data.startDate || wx.getStorageSync('startDate') || '2000-01-22';
+      if (data.startDate) wx.setStorageSync('startDate', data.startDate);
+      const daysStr = daysSince(savedStart).toLocaleString('zh-CN');
 
       const photoCount = photos.length;
 
@@ -242,7 +242,7 @@ Page({
       if (this.data.composePhoto) {
         const ext = this.data.composePhoto.split('.').pop() || 'jpg';
         const uploadRes = await wx.cloud.uploadFile({
-          cloudPath: `daily/${Date.now()}.${ext}`,
+          cloudPath: makeCloudPath('daily', ext),
           filePath: this.data.composePhoto,
         });
         imageId = uploadRes.fileID;

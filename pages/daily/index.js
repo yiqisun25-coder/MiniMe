@@ -1,12 +1,8 @@
-const { readData, writeData } = require('../../utils/api');
+const { readData, writeData, makeCloudPath } = require('../../utils/api');
+const { localDateStr, localTimeStr, localToISO } = require('../../utils/time');
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-function nowTimeStr() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
+function todayStr() { return localDateStr(); }
+function nowTimeStr() { return localTimeStr(); }
 
 Page({
   data: {
@@ -53,13 +49,13 @@ Page({
       if (this.data.photoPath) {
         const ext = this.data.photoPath.split('.').pop() || 'jpg';
         const uploadRes = await wx.cloud.uploadFile({
-          cloudPath: `daily/${Date.now()}.${ext}`,
+          cloudPath: makeCloudPath('daily', ext),
           filePath: this.data.photoPath,
         });
         image = uploadRes.fileID;
       }
 
-      const time = new Date(`${this.data.selectedDate}T${this.data.selectedTime}:00`).toISOString();
+      const time = localToISO(this.data.selectedDate, this.data.selectedTime);
 
       data.myDaily = [
         { id: String(Date.now()), text, image, time },

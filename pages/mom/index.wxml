@@ -91,7 +91,7 @@
   <!-- 顶部 header -->
   <view class="header">
     <view class="header-left">
-      <text class="header-date">SAT · {{today}} · 晴</text>
+      <text class="header-date">{{headerDate}}</text>
       <text class="header-greeting">{{greeting}}</text>
     </view>
     <view class="header-avatar" bindtap="onWellnessTap">🌷</view>

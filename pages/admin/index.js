@@ -1,13 +1,10 @@
-const { readData, writeData, getFamilyCode } = require('../../utils/api');
-const { formatDateTime } = require('../../utils/time');
+const { readData, writeData, getFamilyCode, unbindFamily } = require('../../utils/api');
+const { formatDateTime, localDateStr, localTimeStr, localToISO } = require('../../utils/time');
 
 const DEFAULT_AVATAR = '/images/default_avatar.jpg';
 
-function getTodayStr() { return new Date().toISOString().slice(0, 10); }
-function getNowTimeStr() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
+function getTodayStr() { return localDateStr(); }
+function getNowTimeStr() { return localTimeStr(); }
 
 Page({
   data: {
@@ -149,8 +146,8 @@ Page({
     const item = this.data.dailyList.find(r => r.id === id);
     if (!item) return;
     const d = new Date(item.time);
-    const date = d.toISOString().slice(0, 10);
-    const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const date = localDateStr(d);
+    const time = localTimeStr(d);
     this.setData({ editingId: id, editingText: item.text, editingDate: date, editingTime: time });
   },
 
@@ -165,7 +162,7 @@ Page({
     try {
       const app = getApp();
       const data = app.globalData.binData || await readData();
-      const time = new Date(`${this.data.editingDate}T${this.data.editingTime}:00`).toISOString();
+      const time = localToISO(this.data.editingDate, this.data.editingTime);
       data.myDaily = (data.myDaily || []).map(r =>
         r.id === this.data.editingId ? { ...r, text, time } : r
       );
@@ -242,6 +239,31 @@ Page({
       this.setData({ avatarUploading: false });
       wx.showToast({ title: '上传失败，试试别的图', icon: 'none' });
     }
+  },
+
+  onUnbindTap() {
+    wx.showModal({
+      title: '解绑并退出这个家庭？',
+      content: '数据不会删除，之后重新输入邀请码还能连回来',
+      confirmText: '解绑',
+      confirmColor: '#C4706A',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await unbindFamily();
+          wx.removeStorageSync('familyCode');
+          wx.removeStorageSync('userRole');
+          wx.removeStorageSync('startDate');
+          const app = getApp();
+          app.globalData.binData = null;
+          app.globalData.needSetup = true;
+          app.globalData.splashShown = false;
+          wx.reLaunch({ url: '/pages/mom/index' });
+        } catch (e) {
+          wx.showToast({ title: '解绑失败，检查网络', icon: 'none' });
+        }
+      },
+    });
   },
 
   goCompose() { wx.navigateTo({ url: '/pages/compose/index' }); },
