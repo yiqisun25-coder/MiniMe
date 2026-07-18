@@ -1,9 +1,9 @@
 Component({
   lifetimes: {
     attached() {
-      // 女儿端第三个 tab 显示"有我在"
+      // 女儿端第三个 tab 显示"我的"
       if (wx.getStorageSync('userRole') === 'daughter') {
-        this.setData({ 'list[2].text': '有我在' });
+        this.setData({ 'list[2].text': '我的' });
       }
     },
   },
@@ -14,19 +14,19 @@ Component({
     list: [
       {
         pagePath: '/pages/mom/index',
-        text: '妈妈的生活',
+        text: '日常记录',
         icon: '/images/icons/home.svg',
         iconActive: '/images/icons/home-active.svg',
       },
       {
         pagePath: '/pages/together/index',
-        text: '我们俩',
+        text: '相册',
         icon: '/images/icons/heart.svg',
         iconActive: '/images/icons/heart-active.svg',
       },
       {
         pagePath: '/pages/index/index',
-        text: '陪陪我',
+        text: '我的',
         icon: '/images/icons/person.svg',
         iconActive: '/images/icons/person-active.svg',
       },

@@ -234,7 +234,7 @@ Page({
 
   onUnbindTap() {
     wx.showModal({
-      title: '解绑并退出这个家庭？',
+      title: '解绑此设备？',
       content: '数据不会删除，之后重新输入邀请码还能连回来',
       confirmText: '解绑',
       confirmColor: '#C4706A',

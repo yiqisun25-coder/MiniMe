@@ -71,7 +71,7 @@
     <text class="s-title">我在这里</text>
     <view class="s-sub-row">
       <view class="s-sub-line"></view>
-      <text class="s-sub">妈妈，今天也想你了</text>
+      <text class="s-sub">新的一天，从记录开始</text>
       <view class="s-sub-line"></view>
     </view>
     <text class="s-en">I'M HERE WITH YOU</text>
@@ -80,9 +80,9 @@
   <!-- 按钮 -->
   <view class="s-btn-wrap" bindtap="onSplashTap">
     <view class="s-btn">
-      <text class="s-btn-text">轻轻推开门 →</text>
+      <text class="s-btn-text">开始使用 →</text>
     </view>
-    <text wx:if="{{daysTogether}}" class="s-days-text">和妈妈一起走过的第 {{daysTogether}} 天</text>
+    <text wx:if="{{daysTogether}}" class="s-days-text">已记录 {{daysTogether}} 天</text>
   </view>
 </view>
 
@@ -113,7 +113,7 @@
 
   <!-- 分区标题 -->
   <view class="section-header">
-    <text class="section-title">妈妈的生活</text>
+    <text class="section-title">日常记录</text>
     <text class="section-more">全部 ›</text>
   </view>
 
@@ -122,7 +122,7 @@
     <view class="quick-icon-box">
       <text class="quick-icon">✏️</text>
     </view>
-    <text class="quick-text">{{showForm ? '× 取消编辑' : '今天想记点什么呢…'}}</text>
+    <text class="quick-text">{{showForm ? '× 取消编辑' : '记录今天'}}</text>
   </view>
 
   <!-- 记录表单（仅妈妈） -->
@@ -141,7 +141,7 @@
     </view>
     <textarea
       class="textarea"
-      placeholder="今天想记点什么…"
+      placeholder="今日记录"
       placeholder-class="placeholder"
       value="{{inputText}}"
       bindinput="onTextInput"
@@ -180,7 +180,7 @@
   </view>
   <view class="empty" wx:elif="{{!loading && records.length === 0 && !showForm}}">
     <text class="empty-icon">🌸</text>
-    <text class="empty-text">妈妈还没有写今天的日记哦</text>
+    <text class="empty-text">今天还没有记录</text>
   </view>
 
   <!-- 日记列表 -->

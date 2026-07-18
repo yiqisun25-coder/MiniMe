@@ -2,7 +2,7 @@
   <!-- 顶部日期 -->
   <view class="top-meta">
     <text class="top-date">{{heroDate}}</text>
-    <text class="page-title">{{isDaughter ? '有我在' : '陪陪我'}}</text>
+    <text class="page-title">我的</text>
   </view>
 
   <!-- 头像区域 -->
@@ -17,40 +17,40 @@
     <view class="side-icon side-icon-right"><text>🌙</text></view>
     <!-- 状态气泡 -->
     <view class="status-bubble {{bubbleVisible ? 'bubble-show' : ''}}">
-      <text class="status-text">{{bubbleVisible ? currentResponse : (isDaughter ? '「美好的一天开始啦 🌸」' : '「妈～ 我在认真上班哦 💪」')}}</text>
+      <text class="status-text">{{bubbleVisible ? currentResponse : '「美好的一天开始啦 🌸」'}}</text>
     </view>
   </view>
 
-  <!-- 动作网格：女儿端 = 功能入口，妈妈端 = 场景卡片 -->
+  <!-- 动作网格：女儿端 = 功能入口；妈妈端场景卡片审核期间隐藏（showScenes 开关，代码保留） -->
   <view class="action-section">
-    <text class="action-title">{{isDaughter ? '今天想做什么？' : '想和女儿说点什么？'}}</text>
+    <text class="action-title">快捷入口</text>
 
     <!-- 女儿端功能网格 -->
     <view wx:if="{{isDaughter}}" class="action-grid">
       <view class="action-card morning" bindtap="goCompose">
-        <text class="action-emoji">✉️</text>
-        <text class="action-label">给妈妈写信</text>
-        <text class="action-sub">写封长信</text>
+        <text class="action-emoji">✏️</text>
+        <text class="action-label">长文记录</text>
+        <text class="action-sub">记录长文</text>
       </view>
       <view class="action-card night" bindtap="goDaily">
         <text class="action-emoji">📝</text>
-        <text class="action-label">存我的日常</text>
+        <text class="action-label">记录日常</text>
         <text class="action-sub">记录今天</text>
       </view>
       <view class="action-card miss" bindtap="goMemory">
         <text class="action-emoji">🔒</text>
-        <text class="action-label">预存记忆</text>
-        <text class="action-sub">定时解锁</text>
+        <text class="action-label">定时记录</text>
+        <text class="action-sub">到期可见</text>
       </view>
       <view class="action-card secret" bindtap="goAdmin">
         <text class="action-emoji">⚙️</text>
-        <text class="action-label">点我设置</text>
-        <text class="action-sub">管理家庭</text>
+        <text class="action-label">设置</text>
+        <text class="action-sub">数据管理</text>
       </view>
     </view>
 
-    <!-- 妈妈端场景网格 -->
-    <view wx:else class="action-grid">
+    <!-- 妈妈端场景网格（审核期间 showScenes=false 隐藏，过审后恢复） -->
+    <view wx:elif="{{showScenes}}" class="action-grid">
       <view
         wx:for="{{scenes}}"
         wx:key="key"
@@ -63,15 +63,29 @@
         <text class="action-sub">{{item.desc}}</text>
       </view>
     </view>
+
+    <!-- 妈妈端审核期间显示：中性快捷入口 -->
+    <view wx:else class="action-grid">
+      <view class="action-card morning" bindtap="goToMailbox">
+        <text class="action-emoji">📂</text>
+        <text class="action-label">归档记录</text>
+        <text class="action-sub">查看长文</text>
+      </view>
+      <view class="action-card night" bindtap="goTalk">
+        <text class="action-emoji">📝</text>
+        <text class="action-label">快捷记录</text>
+        <text class="action-sub">随手记一条</text>
+      </view>
+    </view>
   </view>
 
-  <!-- 收信箱入口（仅妈妈：读女儿写的信） -->
+  <!-- 归档记录入口（仅妈妈端） -->
   <view wx:if="{{!isDaughter}}" class="letter-entry" bindtap="goToMailbox">
     <view class="letter-entry-left">
-      <text class="letter-entry-icon">💌</text>
+      <text class="letter-entry-icon">📂</text>
       <view>
-        <text class="letter-entry-title">给你的信</text>
-        <text class="letter-entry-sub">妈妈的收信箱，有新消息会提醒你</text>
+        <text class="letter-entry-title">归档记录</text>
+        <text class="letter-entry-sub">查看已同步的长文记录</text>
       </view>
     </view>
     <view class="letter-entry-right">

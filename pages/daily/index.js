@@ -64,7 +64,7 @@ Page({
       ];
       await writeData(data);
       app.globalData.binData = data;
-      notifyFamily(`女儿：${text}`);
+      notifyFamily(`新记录：${text}`);
       this.setData({ submitted: true, submitting: false });
     } catch (e) {
       this.setData({ submitting: false });

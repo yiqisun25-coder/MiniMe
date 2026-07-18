@@ -3,7 +3,7 @@
   <view wx:if="{{!submitted}}">
     <input
       class="title-input"
-      placeholder="信件标题（比如：最近的一些事）"
+      placeholder="标题"
       placeholder-class="placeholder"
       value="{{title}}"
       bindinput="onTitleInput"
@@ -12,7 +12,7 @@
 
     <textarea
       class="textarea"
-      placeholder="亲爱的妈妈，…"
+      placeholder="正文…"
       placeholder-class="placeholder"
       value="{{content}}"
       bindinput="onContentInput"
@@ -25,15 +25,15 @@
       class="submit-btn {{(!title || !content || submitting) ? 'disabled' : ''}}"
       bindtap="onSubmit"
     >
-      <text>{{submitting ? '发送中…' : '放进信箱 📮'}}</text>
+      <text>{{submitting ? '发送中…' : '保存'}}</text>
     </view>
   </view>
 
   <view class="success" wx:else>
     <text class="success-icon">📮</text>
-    <text class="success-text">信已经放进去了 💕\n妈妈下次打开就能看到</text>
+    <text class="success-text">已保存</text>
     <view class="back-btn" bindtap="onBack">
-      <text>返回后台</text>
+      <text>返回</text>
     </view>
   </view>
 

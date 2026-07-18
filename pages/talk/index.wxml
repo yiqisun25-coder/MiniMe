@@ -1,14 +1,14 @@
 <view class="container">
 
   <view class="greeting-card">
-    <text class="greeting-text">妈妈，今天有什么想跟我说的？</text>
-    <text class="greeting-sub">开心的、不开心的，都可以 💕</text>
+    <text class="greeting-text">记录今天</text>
+    <text class="greeting-sub">随手写下此刻</text>
   </view>
 
   <view wx:if="{{!submitted}}">
     <textarea
       class="textarea"
-      placeholder="跟我说说…"
+      placeholder="今日记录"
       placeholder-class="placeholder"
       value="{{inputText}}"
       bindinput="onInput"
@@ -20,15 +20,15 @@
       class="submit-btn {{(!inputText || submitting) ? 'disabled' : ''}}"
       bindtap="onSubmit"
     >
-      <text>{{submitting ? '发送中…' : '告诉我 💌'}}</text>
+      <text>{{submitting ? '发送中…' : '保存'}}</text>
     </view>
   </view>
 
   <view class="success" wx:else>
     <text class="success-icon">💌</text>
-    <text class="success-text">我收到啦，我都看着呢 ❤️</text>
+    <text class="success-text">已保存</text>
     <view class="again-btn" bindtap="onReset">
-      <text>再说一条</text>
+      <text>再记一条</text>
     </view>
   </view>
 

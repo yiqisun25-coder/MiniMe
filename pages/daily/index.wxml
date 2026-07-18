@@ -1,10 +1,10 @@
 <view class="container">
 
   <view wx:if="{{!submitted}}">
-    <text class="hint">妈妈会在「我们俩」里看到这条</text>
+    <text class="hint">保存后可在「相册」中查看</text>
     <textarea
       class="textarea"
-      placeholder="今天在做什么，随手写…"
+      placeholder="今日记录…"
       placeholder-class="placeholder"
       value="{{text}}"
       bindinput="onInput"
@@ -47,10 +47,10 @@
 
   <view class="success" wx:else>
     <text class="success-icon">✅</text>
-    <text class="success-text">存好了，妈妈能看到</text>
+    <text class="success-text">已保存</text>
     <view class="row">
       <view class="again-btn" bindtap="onReset"><text>再存一条</text></view>
-      <view class="back-btn"  bindtap="onBack" ><text>返回后台</text></view>
+      <view class="back-btn"  bindtap="onBack" ><text>返回</text></view>
     </view>
   </view>
 

@@ -2,35 +2,37 @@
 
   <!-- 初始选择 -->
   <view wx:if="{{step === 'initial'}}">
-    <text class="logo">💕</text>
+    <text class="logo">📔</text>
     <text class="title">MiniMe</text>
-    <text class="subtitle">一个专属你们的小空间</text>
+    <text class="subtitle">个人日常记录与多设备同步工具</text>
 
     <view class="card" bindtap="onCreateTap">
-      <text class="card-emoji">👧</text>
-      <text class="card-main">我是女儿</text>
-      <text class="card-sub">创建家庭，生成邀请码</text>
+      <text class="card-emoji">✨</text>
+      <text class="card-main">创建同步码</text>
+      <text class="card-sub">首次使用，生成我的同步码</text>
     </view>
 
     <view class="card" bindtap="onJoinTap">
-      <text class="card-emoji">👩</text>
-      <text class="card-main">我是妈妈</text>
-      <text class="card-sub">输入女儿给我的邀请码</text>
+      <text class="card-emoji">🔗</text>
+      <text class="card-main">输入同步码</text>
+      <text class="card-sub">在这台设备上同步已有数据</text>
     </view>
 
     <text class="error" wx:if="{{error}}">{{error}}</text>
+
+    <text class="privacy-note">本小程序不提供内容公开发布、陌生人浏览、社交关系链功能，所有数据仅存储于用户自己的云开发环境，仅本人及已绑定设备可见。</text>
   </view>
 
-  <!-- 设置专属邀请码 -->
+  <!-- 设置同步码 -->
   <view wx:elif="{{step === 'set_code' || step === 'creating'}}">
     <text class="logo">🔑</text>
-    <text class="title">设个专属码</text>
-    <text class="subtitle">你们俩的暗号，好记就行</text>
+    <text class="title">设置同步码</text>
+    <text class="subtitle">用于多设备数据同步，好记就行</text>
 
     <input
       class="code-input"
       style="color:#2A1F10;"
-      placeholder="留空自动生成，或比如 MOM520"
+      placeholder="留空自动生成"
       placeholder-class="code-placeholder"
       value="{{customCode}}"
       bindinput="onCustomCodeInput"
@@ -39,15 +41,15 @@
     />
     <text class="input-hint">6位：3个字母 + 3个数字，不区分大小写</text>
 
-    <text class="name-label">我们从哪天开始算 💛</text>
+    <text class="name-label">记录起始日期</text>
     <picker mode="date" value="{{startDate}}" end="{{today}}" bindchange="onStartDateChange">
       <view class="date-picker-row">
         <text class="date-picker-icon">📅</text>
-        <text class="date-picker-val {{startDate ? '' : 'date-picker-placeholder'}}">{{startDate || '选一个有意义的日期'}}</text>
+        <text class="date-picker-val {{startDate ? '' : 'date-picker-placeholder'}}">{{startDate || '选择日期'}}</text>
         <text wx:if="{{startDate}}" class="date-picker-change">修改</text>
       </view>
     </picker>
-    <text class="input-hint">比如妈妈的生日、第一次视频通话的日子…</text>
+    <text class="input-hint">天数统计将从该日期开始计算</text>
 
     <text class="error" wx:if="{{error}}">{{error}}</text>
 
@@ -57,28 +59,28 @@
     <view class="btn-back" bindtap="onBackToInitial"><text>← 返回</text></view>
   </view>
 
-  <!-- 创建成功，展示邀请码 -->
+  <!-- 创建成功，展示同步码 -->
   <view wx:elif="{{step === 'created'}}">
     <text class="logo">🎉</text>
-    <text class="title">家庭建好了</text>
-    <text class="subtitle">把邀请码发给妈妈</text>
+    <text class="title">同步码已生成</text>
+    <text class="subtitle">在其他设备输入即可同步数据</text>
 
     <view class="code-box">
-      <text class="code-label">你的家庭邀请码</text>
+      <text class="code-label">你的同步码</text>
       <text class="code-text">{{familyCode}}</text>
-      <text class="code-hint">妈妈打开小程序后输入这个邀请码就连上了</text>
+      <text class="code-hint">在另一台设备打开小程序，输入这个同步码即可同步数据</text>
     </view>
 
     <view class="btn-primary" bindtap="onEnterApp">
-      <text>进入我们的小空间 →</text>
+      <text>开始使用 →</text>
     </view>
   </view>
 
-  <!-- 输入邀请码 -->
+  <!-- 输入同步码 -->
   <view wx:elif="{{step === 'joining' || step === 'joining_loading'}}">
-    <text class="logo">💌</text>
-    <text class="title">输入邀请码</text>
-    <text class="subtitle">女儿发给你的那个邀请码</text>
+    <text class="logo">🔗</text>
+    <text class="title">输入同步码</text>
+    <text class="subtitle">输入已创建的同步码</text>
 
     <input
       class="code-input"
@@ -94,7 +96,7 @@
     <text class="error" wx:if="{{error}}">{{error}}</text>
 
     <view class="btn-primary {{step === 'joining_loading' ? 'disabled' : ''}}" bindtap="onConfirmJoin">
-      <text>{{step === 'joining_loading' ? '连接中…' : '连上去 💕'}}</text>
+      <text>{{step === 'joining_loading' ? '连接中…' : '确认 →'}}</text>
     </view>
 
     <view class="btn-back" bindtap="onBackToInitial">
