@@ -39,28 +39,6 @@
     />
     <text class="input-hint">6位：3个字母 + 3个数字，不区分大小写</text>
 
-    <text class="name-label">妈妈叫我</text>
-    <input
-      class="name-input"
-      style="color:#2A1F10;"
-      placeholder="比如 祎琦"
-      placeholder-class="code-placeholder"
-      value="{{daughterName}}"
-      bindinput="onNameInput"
-      maxlength="10"
-    />
-
-    <text class="name-label">我叫妈妈</text>
-    <input
-      class="name-input"
-      style="color:#2A1F10;"
-      placeholder="比如 妈妈"
-      placeholder-class="code-placeholder"
-      value="{{momName}}"
-      bindinput="onMomNameInput"
-      maxlength="10"
-    />
-
     <text class="name-label">我们从哪天开始算 💛</text>
     <picker mode="date" value="{{startDate}}" end="{{today}}" bindchange="onStartDateChange">
       <view class="date-picker-row">
