@@ -65,17 +65,25 @@
 .side-icon {
   position: absolute;
   width: 96rpx;
-  height: 96rpx;
   border-radius: 50%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8rpx;
   font-size: 44rpx;
   box-shadow: 0 8rpx 24rpx rgba(42,31,16,0.08);
   top: 80rpx;
+  padding: 16rpx 0 12rpx;
 }
 .side-icon-left  { left: 60rpx;  background: #FBEFC9; }
 .side-icon-right { right: 60rpx; background: #E7EAF3; }
+.side-icon-label {
+  font-size: 18rpx;
+  color: #A89F92;
+  font-weight: 500;
+  letter-spacing: 0.5rpx;
+}
 
 .status-bubble {
   position: absolute;
@@ -85,6 +93,11 @@
   padding: 22rpx 36rpx;
   box-shadow: 0 12rpx 36rpx rgba(42,31,16,0.08);
   white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+.bubble-show {
+  opacity: 1;
 }
 .status-text {
   font-size: 28rpx;

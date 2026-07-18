@@ -82,6 +82,7 @@ Page({
     unreadCount: 0,
     latestLetter: null,
     adminHint: '',
+    isDaughter: false,
   },
 
   _tapCount: 0,
@@ -94,7 +95,7 @@ Page({
     }
     const now = new Date();
     const monthDay = `${now.getMonth() + 1}月${now.getDate()}日`;
-    this.setData({ greeting: getGreeting(), heroDate: getHeroDate(), today: monthDay });
+    this.setData({ greeting: getGreeting(), heroDate: getHeroDate(), today: monthDay, isDaughter: getUserRole() === 'daughter' });
     this._loadData();
   },
 
