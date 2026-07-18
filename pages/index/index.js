@@ -87,6 +87,7 @@ Page({
     adminHint: '',
     isDaughter: false,
     _responseIdx: 0,
+    _sceneIdx: { morning: 0, night: 0, miss: 0, secret: 0 },
   },
 
   _tapCount: 0,
@@ -170,7 +171,11 @@ Page({
   onSceneTap(e) {
     const key = e.currentTarget.dataset.key;
     const responses = SCENES[key].responses;
-    const text = responses[Math.floor(Math.random() * responses.length)];
+    const sceneIdx = this.data._sceneIdx;
+    const idx = sceneIdx[key] % responses.length;
+    const text = responses[idx];
+    sceneIdx[key] = idx + 1;
+    this.setData({ _sceneIdx: sceneIdx });
     // 有上传头像 → 固定显示；没有 → 用场景专属照片
     const avatarSrc = this.data.uploadedAvatar || PHOTOS[key] || PHOTOS.main;
     this.setData({ bubbleVisible: false, avatarSrc });
