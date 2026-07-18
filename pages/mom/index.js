@@ -104,9 +104,9 @@ Page({
   },
 
   onLoad() {
-    const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
-    const days = daysSince(savedStart);
-    this.setData({ today: getTodayStr(), selectedDate: getTodayStr(), selectedTime: getNowTimeStr(), daysTogether: days.toLocaleString('zh-CN') });
+    const savedStart = wx.getStorageSync('startDate');
+    const daysVal = savedStart ? daysSince(savedStart).toLocaleString('zh-CN') : '';
+    this.setData({ today: getTodayStr(), selectedDate: getTodayStr(), selectedTime: getNowTimeStr(), daysTogether: daysVal });
     const app = getApp();
     if (!app.globalData.splashShown) {
       app.globalData.splashShown = true;
@@ -136,9 +136,9 @@ Page({
     if (app.globalData.showSplashOnNext) {
       app.globalData.showSplashOnNext = false;
       app.globalData.splashShown = true;
-      const savedStart = wx.getStorageSync('startDate') || '2000-01-22';
-      const days = daysSince(savedStart);
-      this.setData({ showSplash: true, splashFading: false, daysTogether: days.toLocaleString('zh-CN') });
+      const savedStart = wx.getStorageSync('startDate');
+      const daysVal = savedStart ? daysSince(savedStart).toLocaleString('zh-CN') : '';
+      this.setData({ showSplash: true, splashFading: false, daysTogether: daysVal });
       if (typeof this.getTabBar === 'function') this.getTabBar().setData({ hidden: true });
       this._splashTimer1 = setTimeout(() => this.setData({ splashFading: true }), 3000);
       this._splashTimer2 = setTimeout(() => {

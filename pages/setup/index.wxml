@@ -29,6 +29,7 @@
 
     <input
       class="code-input"
+      style="color:#2A1F10;"
       placeholder="留空自动生成，或比如 MOM520"
       placeholder-class="code-placeholder"
       value="{{customCode}}"
@@ -41,6 +42,7 @@
     <text class="name-label">妈妈叫我</text>
     <input
       class="name-input"
+      style="color:#2A1F10;"
       placeholder="比如 祎琦"
       placeholder-class="code-placeholder"
       value="{{daughterName}}"
@@ -51,6 +53,7 @@
     <text class="name-label">我叫妈妈</text>
     <input
       class="name-input"
+      style="color:#2A1F10;"
       placeholder="比如 妈妈"
       placeholder-class="code-placeholder"
       value="{{momName}}"
@@ -62,7 +65,8 @@
     <picker mode="date" value="{{startDate}}" end="{{today}}" bindchange="onStartDateChange">
       <view class="date-picker-row">
         <text class="date-picker-icon">📅</text>
-        <text class="date-picker-val">{{startDate || '选一个有意义的日期'}}</text>
+        <text class="date-picker-val {{startDate ? '' : 'date-picker-placeholder'}}">{{startDate || '选一个有意义的日期'}}</text>
+        <text wx:if="{{startDate}}" class="date-picker-change">修改</text>
       </view>
     </picker>
     <text class="input-hint">比如妈妈的生日、第一次视频通话的日子…</text>
@@ -100,6 +104,7 @@
 
     <input
       class="code-input"
+      style="color:#2A1F10;"
       placeholder="例如：ABC123"
       placeholder-class="code-placeholder"
       value="{{inputCode}}"

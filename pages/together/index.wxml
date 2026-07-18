@@ -7,10 +7,12 @@
       <text class="page-title">我们俩</text>
     </view>
     <view class="page-stats-bar">
-      <text class="stats-text">和妈妈一起走过的第</text>
-      <text class="stats-num">{{daysTogether}}</text>
-      <text class="stats-text">天</text>
-      <view class="stats-divider"></view>
+      <block wx:if="{{daysTogether}}">
+        <text class="stats-text">和妈妈一起走过的第</text>
+        <text class="stats-num">{{daysTogether}}</text>
+        <text class="stats-text">天</text>
+        <view class="stats-divider"></view>
+      </block>
       <text class="stats-num">{{photoCount}}</text>
       <text class="stats-text">张照片</text>
     </view>

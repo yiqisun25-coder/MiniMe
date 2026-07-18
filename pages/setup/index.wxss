@@ -173,10 +173,22 @@
 }
 
 .code-placeholder {
-  color: #D8C8BE;
+  color: #BBAAA0;
   font-size: 30rpx;
   font-weight: 400;
   letter-spacing: 3px;
+}
+
+.date-picker-placeholder {
+  color: #BBAAA0;
+}
+
+.date-picker-change {
+  font-size: 22rpx;
+  color: #A89F92;
+  background: #F0E8DC;
+  border-radius: 20rpx;
+  padding: 6rpx 18rpx;
 }
 
 .btn-primary {

@@ -82,7 +82,7 @@
     <view class="s-btn">
       <text class="s-btn-text">轻轻推开门 →</text>
     </view>
-    <text class="s-days-text">和妈妈一起走过的第 {{daysTogether}} 天</text>
+    <text wx:if="{{daysTogether}}" class="s-days-text">和妈妈一起走过的第 {{daysTogether}} 天</text>
   </view>
 </view>
 

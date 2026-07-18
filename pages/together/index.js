@@ -166,9 +166,9 @@ Page({
       }
 
       // 天数：优先用云端家庭数据里的起始日期，并同步到本地（妈妈的设备靠这里拿到女儿设置的日期）
-      const savedStart = data.startDate || wx.getStorageSync('startDate') || '2000-01-22';
+      const savedStart = data.startDate || wx.getStorageSync('startDate');
       if (data.startDate) wx.setStorageSync('startDate', data.startDate);
-      const daysStr = daysSince(savedStart).toLocaleString('zh-CN');
+      const daysStr = savedStart ? daysSince(savedStart).toLocaleString('zh-CN') : '';
 
       const photoCount = photos.length;
 
