@@ -17,7 +17,7 @@
     <view class="side-icon side-icon-right"><text>🌙</text></view>
     <!-- 状态气泡 -->
     <view class="status-bubble {{bubbleVisible ? 'bubble-show' : ''}}">
-      <text class="status-text">{{bubbleVisible ? currentResponse : (isDaughter ? '「妈妈，今天我也想你了 💕」' : '「妈～ 我在认真上班哦 💪」')}}</text>
+      <text class="status-text">{{bubbleVisible ? currentResponse : (isDaughter ? '「妈，美好的一天开始啦 🌸」' : '「妈～ 我在认真上班哦 💪」')}}</text>
     </view>
   </view>
 
