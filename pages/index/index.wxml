@@ -27,10 +27,36 @@
     </view>
   </view>
 
-  <!-- 动作网格 -->
+  <!-- 动作网格：女儿端 = 功能入口，妈妈端 = 场景卡片 -->
   <view class="action-section">
-    <text class="action-title">想和女儿说点什么？</text>
-    <view class="action-grid">
+    <text class="action-title">{{isDaughter ? '今天想做什么？' : '想和女儿说点什么？'}}</text>
+
+    <!-- 女儿端功能网格 -->
+    <view wx:if="{{isDaughter}}" class="action-grid">
+      <view class="action-card morning" bindtap="goCompose">
+        <text class="action-emoji">✉️</text>
+        <text class="action-label">给妈妈写信</text>
+        <text class="action-sub">写封长信</text>
+      </view>
+      <view class="action-card night" bindtap="goDaily">
+        <text class="action-emoji">📝</text>
+        <text class="action-label">存我的日常</text>
+        <text class="action-sub">记录今天</text>
+      </view>
+      <view class="action-card miss" bindtap="goMemory">
+        <text class="action-emoji">🔒</text>
+        <text class="action-label">预存记忆</text>
+        <text class="action-sub">定时解锁</text>
+      </view>
+      <view class="action-card secret" bindtap="goAdmin">
+        <text class="action-emoji">⚙️</text>
+        <text class="action-label">点我设置</text>
+        <text class="action-sub">管理家庭</text>
+      </view>
+    </view>
+
+    <!-- 妈妈端场景网格 -->
+    <view wx:else class="action-grid">
       <view
         wx:for="{{scenes}}"
         wx:key="key"

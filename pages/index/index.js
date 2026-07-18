@@ -183,4 +183,9 @@ Page({
       this.setData({ currentResponse: text, activeScene: key, bubbleVisible: true });
     }, 150);
   },
+
+  goCompose() { wx.navigateTo({ url: '/pages/compose/index' }); },
+  goDaily()   { wx.navigateTo({ url: '/pages/daily/index' }); },
+  goMemory()  { wx.navigateTo({ url: '/pages/memory/index' }); },
+  goAdmin()   { wx.navigateTo({ url: '/pages/admin/index' }); },
 });
