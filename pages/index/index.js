@@ -86,8 +86,6 @@ Page({
     latestLetter: null,
     adminHint: '',
     isDaughter: false,
-    // 审核期间隐藏场景卡片与暖心回应（代码保留，过审后改回 true 即可恢复）
-    showScenes: false,
     _responseIdx: 0,
     _sceneIdx: { morning: 0, night: 0, miss: 0, secret: 0 },
   },
@@ -104,6 +102,12 @@ Page({
     const monthDay = `${now.getMonth() + 1}月${now.getDate()}日`;
     const isDaughter = getUserRole() === 'daughter';
     this.setData({ greeting: getGreeting(), heroDate: getHeroDate(), today: monthDay, isDaughter });
+    // 动态更新 tab bar 第三项文字
+    if (typeof this.getTabBar === 'function') {
+      const list = this.getTabBar().data.list.slice();
+      list[2] = { ...list[2], text: isDaughter ? '有我在' : '陪陪我' };
+      this.getTabBar().setData({ list });
+    }
     this._loadData();
   },
 
@@ -165,12 +169,10 @@ Page({
       this.setData({ adminHint: '' });
     }, 2000);
 
-    // 每拍一下换一条回应（审核期间 showScenes=false 不触发，代码保留）
-    if (this.data.showScenes) {
-      const idx = this.data._responseIdx % ALL_RESPONSES.length;
-      const text = ALL_RESPONSES[idx];
-      this.setData({ currentResponse: text, bubbleVisible: true, _responseIdx: idx + 1 });
-    }
+    // 每拍一下换一条回应
+    const idx = this.data._responseIdx % ALL_RESPONSES.length;
+    const text = ALL_RESPONSES[idx];
+    this.setData({ currentResponse: text, bubbleVisible: true, _responseIdx: idx + 1 });
   },
 
   onSceneTap(e) {
@@ -190,7 +192,6 @@ Page({
   },
 
   goCompose() { wx.navigateTo({ url: '/pages/compose/index' }); },
-  goTalk()    { wx.navigateTo({ url: '/pages/talk/index' }); },
   goDaily()   { wx.navigateTo({ url: '/pages/daily/index' }); },
   goMemory()  { wx.navigateTo({ url: '/pages/memory/index' }); },
   goAdmin()   { wx.navigateTo({ url: '/pages/admin/index' }); },

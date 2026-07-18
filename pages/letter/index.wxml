@@ -6,7 +6,7 @@
   </view>
 
   <view class="read-receipt">
-    <text class="receipt-text">已查看</text>
+    <text class="receipt-text">已读 ❤️</text>
   </view>
 
 </view>

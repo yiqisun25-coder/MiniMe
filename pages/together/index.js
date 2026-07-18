@@ -252,10 +252,10 @@ Page({
       data.myDaily = [...(data.myDaily || []), entry];
       await writeData(data);
       app.globalData.binData = null;
-      notifyFamily(`新记录：${text}`);
+      notifyFamily(`女儿：${text}`);
       this.closeCompose();
       await this.load();
-      wx.showToast({ title: '已保存', icon: 'none' });
+      wx.showToast({ title: '发出去啦 💕', icon: 'none' });
     } catch (e) {
       this.setData({ composeSending: false });
       wx.showToast({ title: '发送失败，再试试', icon: 'none' });
@@ -419,7 +419,7 @@ Page({
       this._applyReactionsToItems(id, newReactions);
       this.setData({ pickerVisible: false, pickerText: '', editingReactionRi: -1 });
     } catch (e) {
-      wx.showToast({ title: '保存失败', icon: 'none' });
+      wx.showToast({ title: '回应失败', icon: 'none' });
     }
   },
 });

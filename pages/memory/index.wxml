@@ -1,11 +1,11 @@
 <view class="container">
 
   <view wx:if="{{!submitted}}">
-    <text class="hint">选一个日期，到期后可查看</text>
+    <text class="hint">选一个日期，到那天妈妈才能解锁这条记忆</text>
 
     <input
       class="title-input"
-      placeholder="标题"
+      placeholder="标题（比如：第一次带我看海）"
       placeholder-class="placeholder"
       value="{{title}}"
       bindinput="onTitleInput"
@@ -14,7 +14,7 @@
 
     <textarea
       class="textarea"
-      placeholder="正文…"
+      placeholder="写点什么吧…"
       placeholder-class="placeholder"
       value="{{text}}"
       bindinput="onTextInput"
@@ -50,7 +50,7 @@
     <text class="success-text">锁好了，{{unlockDate}} 解锁</text>
     <view class="row">
       <view class="again-btn" bindtap="onReset"><text>再存一条</text></view>
-      <view class="back-btn"  bindtap="onBack" ><text>返回</text></view>
+      <view class="back-btn"  bindtap="onBack" ><text>返回后台</text></view>
     </view>
   </view>
 

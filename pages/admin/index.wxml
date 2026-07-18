@@ -9,30 +9,30 @@
       <text>{{avatarUploading ? '上传中…' : '更换头像'}}</text>
     </view>
     <view class="name-edit-row">
-      <text class="name-edit-label">称呼一</text>
+      <text class="name-edit-label">妈妈叫我</text>
       <input class="name-edit-input" value="{{daughterName}}" bindinput="onNameInput"
              placeholder="" placeholder-class="name-placeholder" maxlength="10" />
     </view>
     <view class="name-edit-row">
-      <text class="name-edit-label">称呼二</text>
+      <text class="name-edit-label">我叫妈妈</text>
       <input class="name-edit-input" value="{{momName}}" bindinput="onMomNameInput"
              placeholder="" placeholder-class="name-placeholder" maxlength="10" />
       <view class="name-save-btn" bindtap="saveName"><text>保存</text></view>
     </view>
   </view>
 
-  <!-- 同步码 -->
+  <!-- 家庭邀请码 -->
   <view class="invite-box" wx:if="{{familyCode}}">
-    <text class="invite-label">同步码</text>
+    <text class="invite-label">家庭邀请码</text>
     <text class="invite-code">{{familyCode}}</text>
-    <text class="invite-hint">在另一台设备输入此码即可同步数据</text>
-    <text class="invite-unbind" bindtap="onUnbindTap">解绑此设备</text>
+    <text class="invite-hint">把这个码发给妈妈，她输入后就连上了</text>
+    <text class="invite-unbind" bindtap="onUnbindTap">解绑退出这个家庭</text>
   </view>
 
-  <!-- 快捷记录 -->
+  <!-- 妈妈的留言 -->
   <view class="toolbar">
     <text class="toolbar-title">
-      快捷记录{{unreadCount > 0 ? '（' + unreadCount + '条未读）' : ''}}
+      妈妈的留言{{unreadCount > 0 ? '（' + unreadCount + '条未读）' : ''}}
     </text>
     <view class="mark-btn" bindtap="markAllRead" wx:if="{{unreadCount > 0}}">
       <text>全部已读</text>
@@ -44,7 +44,7 @@
   </view>
 
   <view wx:elif="{{messages.length === 0}}" class="empty-small">
-    <text class="empty-text">暂无记录</text>
+    <text class="empty-text">妈妈还没有留言</text>
   </view>
 
   <view wx:else>
@@ -61,37 +61,37 @@
   <view class="action-row">
     <view class="action-btn" bindtap="goCompose">
       <text class="action-emoji">✏️</text>
-      <text class="action-label">长文记录</text>
+      <text class="action-label">给妈妈写信</text>
     </view>
     <view class="action-btn" bindtap="goDaily">
       <text class="action-emoji">📝</text>
-      <text class="action-label">记录日常</text>
+      <text class="action-label">存我的日常</text>
     </view>
     <view class="action-btn" bindtap="goMemory">
       <text class="action-emoji">🔒</text>
-      <text class="action-label">定时记录</text>
+      <text class="action-label">预存记忆</text>
     </view>
   </view>
 
   <!-- 我发出去的 -->
-  <view class="section-title">已保存内容</view>
+  <view class="section-title">我发出去的</view>
 
   <view class="tab-bar">
     <view class="tab {{activeTab === 'daily' ? 'active' : ''}}" data-tab="daily" bindtap="switchTab">
       <text>日常 ({{dailyList.length}})</text>
     </view>
     <view class="tab {{activeTab === 'memory' ? 'active' : ''}}" data-tab="memory" bindtap="switchTab">
-      <text>定时 ({{memoryList.length}})</text>
+      <text>记忆锁 ({{memoryList.length}})</text>
     </view>
     <view class="tab {{activeTab === 'letter' ? 'active' : ''}}" data-tab="letter" bindtap="switchTab">
-      <text>长文 ({{letterList.length}})</text>
+      <text>信 ({{letterList.length}})</text>
     </view>
   </view>
 
   <!-- 日常列表 -->
   <view wx:if="{{activeTab === 'daily'}}">
     <view class="empty-small" wx:if="{{dailyList.length === 0}}">
-      <text class="empty-text">暂无日常记录</text>
+      <text class="empty-text">还没有日常记录</text>
     </view>
     <view wx:for="{{dailyList}}" wx:key="id" class="item-card">
       <view wx:if="{{editingId !== item.id}}">
@@ -129,7 +129,7 @@
   <!-- 记忆锁列表 -->
   <view wx:if="{{activeTab === 'memory'}}">
     <view class="empty-small" wx:if="{{memoryList.length === 0}}">
-      <text class="empty-text">暂无定时记录</text>
+      <text class="empty-text">还没有预存记忆</text>
     </view>
     <view wx:for="{{memoryList}}" wx:key="id" class="item-card">
       <text class="item-time">🔒 {{item.unlockDate}} 解锁</text>
@@ -144,7 +144,7 @@
   <!-- 信列表 -->
   <view wx:if="{{activeTab === 'letter'}}">
     <view class="empty-small" wx:if="{{letterList.length === 0}}">
-      <text class="empty-text">暂无长文记录</text>
+      <text class="empty-text">还没有写过信</text>
     </view>
     <view wx:for="{{letterList}}" wx:key="id" class="item-card">
       <text class="item-time">{{item.timeStr}}{{item.readByMom ? ' · 已读' : ' · 未读'}}</text>

@@ -6,7 +6,7 @@
 
   <view class="empty" wx:elif="{{letters.length === 0}}">
     <text class="empty-icon">📭</text>
-    <text class="empty-text">暂无记录</text>
+    <text class="empty-text">还没有信，快去催我写 😄</text>
   </view>
 
   <view wx:else>

@@ -60,22 +60,13 @@ const WARM_RESPONSES = [
   '谢谢你记下来，这些对我都很珍贵 💕',
 ];
 
-// 审核期间使用中性问候；过审后可恢复原文案
-const WARM_GREETING = false;
 function getGreeting() {
   const h = new Date().getHours();
-  if (WARM_GREETING) {
-    if (h >= 5  && h < 11) return '早上好，亲爱的妈妈 ☀️';
-    if (h >= 11 && h < 14) return '午好，妈妈，吃饭了吗 🍱';
-    if (h >= 14 && h < 18) return '下午好 🌤️';
-    if (h >= 18 && h < 22) return '晚上好 🌙';
-    return '好事会发生 🥜';
-  }
-  if (h >= 5  && h < 11) return '早上好 ☀️';
-  if (h >= 11 && h < 14) return '中午好 🍱';
-  if (h >= 14 && h < 18) return '下午好 🌤️';
-  if (h >= 18 && h < 22) return '晚上好 🌙';
-  return '夜深了，早点休息 🌙';
+  if (h >= 5  && h < 11) return '早上好，亲爱的妈妈 ☀️';
+  if (h >= 11 && h < 14) return '午好，妈妈，吃饭了吗 🍱';
+  if (h >= 14 && h < 18) return '下午好，妈妈，今天过得怎么样 🌤️';
+  if (h >= 18 && h < 22) return '晚上好，妈妈 🌙';
+  return '好事会发生 🥜';
 }
 
 Page({
@@ -277,11 +268,8 @@ Page({
         .map(r => ({ ...r, timeStr: formatDateTime(r.time) }))
         .sort((a, b) => new Date(b.time) - new Date(a.time));
       records = await this._resolveImages(records);
-      notifyFamily(`新记录：${text}`);
-      // 审核期间显示中性提示；过审后可恢复 WARM_RESPONSES 随机文案
-      const response = WARM_GREETING
-        ? WARM_RESPONSES[Math.floor(Math.random() * WARM_RESPONSES.length)]
-        : '已保存 ✅';
+      notifyFamily(`妈妈：${text}`);
+      const response = WARM_RESPONSES[Math.floor(Math.random() * WARM_RESPONSES.length)];
       this.setData({
         submitting: false, showForm: false,
         inputText: '', selectedMood: null, photoPath: '',

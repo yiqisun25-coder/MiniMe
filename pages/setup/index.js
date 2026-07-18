@@ -49,12 +49,12 @@ Page({
         setUserRole(e.role || 'daughter');
         getApp().globalData.needSetup = false;
         getApp().globalData.showSplashOnNext = true;
-        wx.showToast({ title: `已有同步数据（${e.code}），带你进去`, icon: 'none' });
+        wx.showToast({ title: `你已经有家庭啦（${e.code}），带你进去`, icon: 'none' });
         setTimeout(() => wx.navigateBack(), 1200);
         return;
       }
       const msgMap = {
-        code_taken: '这个码已被使用，换一个试试',
+        code_taken: '这个码被别人用了，换一个试试 😄',
         bad_format: '要3个字母加3个数字（6位），比如 MOM520',
       };
       this.setData({
@@ -75,7 +75,7 @@ Page({
   async onConfirmJoin() {
     const code = this.data.inputCode.trim();
     if (code.length < 4) {
-      this.setData({ error: '同步码至少4位，再检查一下' });
+      this.setData({ error: '邀请码至少4位，再检查一下' });
       return;
     }
     this.setData({ step: 'joining_loading', error: '' });
@@ -91,15 +91,15 @@ Page({
       if (e.message === 'already_bound') {
         this.setData({
           step: 'joining',
-          error: `此微信已绑定同步码（${e.code}），如需更换请先在管理页解绑`,
+          error: `这个微信已经绑定过家庭（${e.code}），一个人只能加入一个家庭。如果绑错了，在管理页可以解绑`,
         });
         return;
       }
       if (e.message === 'family_full') {
-        this.setData({ step: 'joining', error: '该同步码绑定设备数已达上限' });
+        this.setData({ step: 'joining', error: '这个家庭人数已满，加入不了了' });
         return;
       }
-      this.setData({ step: 'joining', error: '没找到这个同步码，确认一下是不是输错了' });
+      this.setData({ step: 'joining', error: '没找到这个邀请码，确认一下是不是输错了' });
     }
   },
 
