@@ -11,12 +11,12 @@
     <view class="name-edit-row">
       <text class="name-edit-label">妈妈叫我</text>
       <input class="name-edit-input" value="{{daughterName}}" bindinput="onNameInput"
-             placeholder="比如 祎琦" placeholder-class="name-placeholder" maxlength="10" />
+             placeholder="" placeholder-class="name-placeholder" maxlength="10" />
     </view>
     <view class="name-edit-row">
       <text class="name-edit-label">我叫妈妈</text>
       <input class="name-edit-input" value="{{momName}}" bindinput="onMomNameInput"
-             placeholder="比如 妈妈" placeholder-class="name-placeholder" maxlength="10" />
+             placeholder="" placeholder-class="name-placeholder" maxlength="10" />
       <view class="name-save-btn" bindtap="saveName"><text>保存</text></view>
     </view>
   </view>

@@ -49,6 +49,9 @@ const SCENES = {
   },
 };
 
+// 所有场景回应合并，拍头像时轮换用
+const ALL_RESPONSES = Object.values(SCENES).flatMap(s => s.responses);
+
 function getGreeting() {
   const h = new Date().getHours();
   if (h >= 5  && h < 12) return '早安，妈妈 ☀';
@@ -83,6 +86,7 @@ Page({
     latestLetter: null,
     adminHint: '',
     isDaughter: false,
+    _responseIdx: 0,
   },
 
   _tapCount: 0,
@@ -156,6 +160,11 @@ Page({
       this._tapCount = 0;
       this.setData({ adminHint: '' });
     }, 2000);
+
+    // 每拍一下换一条回应
+    const idx = this.data._responseIdx % ALL_RESPONSES.length;
+    const text = ALL_RESPONSES[idx];
+    this.setData({ currentResponse: text, bubbleVisible: true, _responseIdx: idx + 1 });
   },
 
   onSceneTap(e) {
