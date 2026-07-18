@@ -11,6 +11,7 @@
     <view class="avatar-ring" bindtap="onAvatarTap">
       <image class="hero-avatar" src="{{avatarSrc}}" mode="aspectFill" />
     </view>
+    <text wx:if="{{adminHint}}" class="admin-hint">{{adminHint}}</text>
     <!-- 侧边图标 -->
     <view class="side-icon side-icon-left">☀️</view>
     <view class="side-icon side-icon-right">🌙</view>

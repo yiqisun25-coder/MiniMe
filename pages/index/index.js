@@ -81,6 +81,7 @@ Page({
     bubbleVisible: false,
     unreadCount: 0,
     latestLetter: null,
+    adminHint: '',
   },
 
   _tapCount: 0,
@@ -143,10 +144,17 @@ Page({
     clearTimeout(this._tapTimer);
     if (this._tapCount >= 5) {
       this._tapCount = 0;
+      this.setData({ adminHint: '' });
       wx.navigateTo({ url: '/pages/admin/index' });
       return;
     }
-    this._tapTimer = setTimeout(() => { this._tapCount = 0; }, 2000);
+    if (getUserRole() === 'daughter' && this._tapCount >= 2) {
+      this.setData({ adminHint: `再点 ${5 - this._tapCount} 次进入设置` });
+    }
+    this._tapTimer = setTimeout(() => {
+      this._tapCount = 0;
+      this.setData({ adminHint: '' });
+    }, 2000);
   },
 
   onSceneTap(e) {
