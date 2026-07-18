@@ -2,7 +2,7 @@
   <!-- 顶部日期 -->
   <view class="top-meta">
     <text class="top-date">{{heroDate}}</text>
-    <text class="page-title">陪陪我</text>
+    <text class="page-title">{{isDaughter ? '有我在' : '陪陪我'}}</text>
   </view>
 
   <!-- 头像区域 -->
@@ -13,17 +13,11 @@
     </view>
     <text wx:if="{{adminHint}}" class="admin-hint">{{adminHint}}</text>
     <!-- 侧边图标 -->
-    <view class="side-icon side-icon-left">
-      <text>☀️</text>
-      <text wx:if="{{isDaughter}}" class="side-icon-label">拍拍我</text>
-    </view>
-    <view class="side-icon side-icon-right">
-      <text>🌙</text>
-      <text wx:if="{{isDaughter}}" class="side-icon-label">拍拍我</text>
-    </view>
-    <!-- 状态气泡：点场景后显示回应，默认显示固定文字 -->
+    <view class="side-icon side-icon-left"><text>☀️</text></view>
+    <view class="side-icon side-icon-right"><text>🌙</text></view>
+    <!-- 状态气泡 -->
     <view class="status-bubble {{bubbleVisible ? 'bubble-show' : ''}}">
-      <text class="status-text">{{bubbleVisible ? currentResponse : '「妈～ 我在认真上班哦 💪」'}}</text>
+      <text class="status-text">{{bubbleVisible ? currentResponse : (isDaughter ? '「妈妈，今天我也想你了 💕」' : '「妈～ 我在认真上班哦 💪」')}}</text>
     </view>
   </view>
 

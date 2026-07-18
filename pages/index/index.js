@@ -100,7 +100,14 @@ Page({
     }
     const now = new Date();
     const monthDay = `${now.getMonth() + 1}月${now.getDate()}日`;
-    this.setData({ greeting: getGreeting(), heroDate: getHeroDate(), today: monthDay, isDaughter: getUserRole() === 'daughter' });
+    const isDaughter = getUserRole() === 'daughter';
+    this.setData({ greeting: getGreeting(), heroDate: getHeroDate(), today: monthDay, isDaughter });
+    // 动态更新 tab bar 第三项文字
+    if (typeof this.getTabBar === 'function') {
+      const list = this.getTabBar().data.list.slice();
+      list[2] = { ...list[2], text: isDaughter ? '有我在' : '陪陪我' };
+      this.getTabBar().setData({ list });
+    }
     this._loadData();
   },
 

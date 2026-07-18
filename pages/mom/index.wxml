@@ -117,16 +117,16 @@
     <text class="section-more">全部 ›</text>
   </view>
 
-  <!-- 快捷记录入口 -->
-  <view class="quick-entry" bindtap="toggleForm">
+  <!-- 快捷记录入口（仅妈妈） -->
+  <view wx:if="{{userRole === 'mom'}}" class="quick-entry" bindtap="toggleForm">
     <view class="quick-icon-box">
       <text class="quick-icon">✏️</text>
     </view>
     <text class="quick-text">{{showForm ? '× 取消编辑' : '今天想记点什么呢…'}}</text>
   </view>
 
-  <!-- 记录表单 -->
-  <view class="form-card" wx:if="{{showForm}}">
+  <!-- 记录表单（仅妈妈） -->
+  <view class="form-card" wx:if="{{userRole === 'mom' && showForm}}">
     <view class="mood-row">
       <view
         wx:for="{{moods}}"
