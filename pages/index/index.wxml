@@ -65,8 +65,8 @@
     </view>
   </view>
 
-  <!-- 收信箱入口 -->
-  <view class="letter-entry" bindtap="goToMailbox">
+  <!-- 收信箱入口（仅妈妈：读女儿写的信） -->
+  <view wx:if="{{!isDaughter}}" class="letter-entry" bindtap="goToMailbox">
     <view class="letter-entry-left">
       <text class="letter-entry-icon">💌</text>
       <view>

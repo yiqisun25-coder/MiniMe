@@ -1,4 +1,12 @@
 Component({
+  lifetimes: {
+    attached() {
+      // 女儿端第三个 tab 显示"有我在"
+      if (wx.getStorageSync('userRole') === 'daughter') {
+        this.setData({ 'list[2].text': '有我在' });
+      }
+    },
+  },
   data: {
     selected: 0,
     hidden: false,
